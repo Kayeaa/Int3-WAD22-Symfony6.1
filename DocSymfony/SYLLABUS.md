@@ -315,9 +315,13 @@ cd Projet1Symfony
 symfony serve
 ```` 
 
-
 - Testez le bon fonctionnement du serveur en regardant les messages sur la console et en tapant l'adresse suivante dans le navigateur : http://localhost:8000/
   Vous devriez être dirigé à une page d'accueil.
+
+Vous pouvez aussi ouvrir un navigateur depuis la console 
+```` 
+symfony open:local
+````
 
 - Ouvrez le dossier de ce projet en Visual Studio et créez un fichier de workspace.
 
@@ -8573,46 +8577,12 @@ BD) et essayez de lancer les actions gestion/action1 et gestion/action2 (depuis 
 
 ### 26.2.2. Dans le controller
 
-Si on ne veut pas créer de restrictions par routes, on peut tout simplement **vérifier si l'utilisateur qui est connecté possède le rôle demandé** à l'intérieur d'une action du controller.
+Si on ne veut pas créer de restrictions par routes, on peut tout simplement **vérifier si l'utilisateur qui est connecté possède le rôle demandé**.
+La façon la plus simple est d'utiliser des **annotations pour l'action** (@IsGranted ou encore mieux, **@Security**. Regardez des exemples ici: 
 
-**Exemple**: 
-
-Dans une action, permettre l'accès à l'action uniquement au role ROLE_CLIENT
-
-```php
-$this->denyAccessUnlessGranted(["ROLE_CLIENT"]);
-```
-
-Si l'user n'a aucun de ces rôles il y aura une exception.
-
-Créez le controller **AutreController** et ses vues, en rajoutant le code qui vérifie le rôle :
-
-```php
-#[Route("/autre/action1")]
-public function action1()
-{
-    // deux rôles peuvent avoir l'accès
-    // mais il y a un bug! this->denyAccessUnlessGranted(['ROLE_CLIENT','ROLE_ADMIN']);
-
-    $this->denyAccessUnlessGranted("ROLE_ADMIN");
-
-    return $this->render('autre/action1.html.twig');
-}
+https://symfony.com/bundles/SensioFrameworkExtraBundle/current/annotations/security.html
 
 
-#[Route("/autre/action2")]
-public function action2()
-{
-
-    // deux rôles peuvent avoir l'accès
-    // mais il y a un bug! this->denyAccessUnlessGranted(['ROLE_CLIENT','ROLE_ADMIN']);
-
-    $this->denyAccessUnlessGranted('ROLE_GESTIONNAIRE');
-
-    // si pas d'exception...
-    return $this->render('autre/action2.html.twig');
-}
-```
 Si l'utilisateur ne possède pas le rôle fixé dans l'action, **une exception sera lancée.** Pour tester le bon fonctionnement faites d'abord logout. Faites login avec un user de chaque type (regardez la BD) et essayez de lancer les actions *autre/action1* et *autre/action2* (depuis l'URL). Observez les résultats selon l'user qui est connecté.
 
 <br>
