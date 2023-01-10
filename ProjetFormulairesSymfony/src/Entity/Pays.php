@@ -22,9 +22,9 @@ class Pays
     private $nom;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable = true)
      */
-    private $lienImage;
+    private $image;
 
     public function getId(): ?int
     {
@@ -43,16 +43,14 @@ class Pays
         return $this;
     }
 
-    // on a effacé le type-hinting!
-    public function getLienImage()
+    public function getImage() : ?string
     {
-        return $this->lienImage;
+        return $this->image;
     }
 
-    // on a effacé le type-hinting!
-    public function setLienImage($lienImage)
+    public function setImage($image) : self
     {
-        $this->lienImage = $lienImage;
+        $this->image = $image;
 
         return $this;
     }

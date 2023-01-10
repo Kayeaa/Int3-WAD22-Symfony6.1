@@ -14,8 +14,8 @@ class PaysFixtures extends Fixture
         for ($i = 0; $i < 20; $i++) {
             $pays = new Pays();
             $pays->setNom("Fixtures" . $i);
-            // on n'a pas d'image encore : $pays->setLienImage("Fixtures" . $i . ".jpg");
-            $pays->setLienImage ("blabla.jpg");
+            // on n'a pas d'image encore : $pays->setImage("Fixtures" . $i . ".jpg");
+            // $pays->setImage ("blabla.jpg"); // on ne vas pas mettre des liens fictifs car les fichiers n'existeront pas!
             $manager->persist($pays);
         }
         $manager->flush();
