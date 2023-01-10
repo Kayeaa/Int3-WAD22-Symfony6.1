@@ -10,10 +10,7 @@
 
     {% if app.user %}
         <div class="mb-3">
-            {# Nous adaptons cette ligne pour
-            - ce qu'on veut afficher dans la page (app.user.xxxx)
-            - la route du logout  #}
-            You are logged in as {{ app.user.email }}, <a href="{{ path('logout') }}">Logout</a>
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
         </div>
     {% endif %}
 

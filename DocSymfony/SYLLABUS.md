@@ -7929,6 +7929,8 @@ class MailController extends AbstractController
 
 <br>
 
+Créez un projet **ProjetLoginPass**.
+
 ## 24.1. Configuration de la sécurité et création d'un formulaire de login
 
 <br>
@@ -7960,10 +7962,10 @@ On va réaliser une configuration de base de la sécurité pour pouvoir créer u
 5.  **Encoder des utilisateurs et de passwords dans la BD** (optionnel fixtures)
 
 6.  **Vérifier** le bon fonctionnement en tapant un couple login/pass valable
-
+--
 <br>
 
-**Voici l'execution de la procedure**: 
+**Voici la procedure**: 
 
 **1**.  **Installer le support de sécurité dans le projet**
 
@@ -7971,8 +7973,7 @@ On va réaliser une configuration de base de la sécurité pour pouvoir créer u
 symfony composer req symfony/security-bundle
 ```
 
-**2**.  **Créer** **une** **entité** **User** avec l'assistant avec
-    **make:user** (pas make:entity!)
+**2**.  **Créer** **une** **entité** **User** avec l'assistant avec **make:user** (pas make:entity!)
 
 ```console
 symfony console make:user
@@ -7993,18 +7994,141 @@ L'assistant vous demandera :
 
 -   Si on souhaite hasher les passwords (oui!)
 
-Ouvrez **src/Entity/User.php** et regardez le code. **Vous pouvez par
-après rajouter d'autres propriétés ou méthodes si vous le souhaitez
+Ouvrez **src/Entity/User.php**:
 
-```console
-symfony console make:entity User 
+```php
+<?php
+
+namespace App\Entity;
+
+use App\Repository\UserRepository;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: '`user`')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 180, unique: true)]
+    private ?string $email = null;
+
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+}
+
+
 ```
-User est le nom de votre entité.
+
+Vous pouvez par après rajouter d'autres propriétés ou méthodes si vous le souhaitez.
+
+**User** est le nom de votre entité.
+Si vous avez besoin vous pouvez rajouter d'autres proprietés et méthodes make:entity
 
 L'assistant aura modifié aussi le fichier **security.yaml** (dans
 **config/packages**) selon les informations qu'on vient de fournir.
 
-Si vous avez besoin vous pouvez rajouter autant de propriétés que vous le souhaitez.
+```yaml
+.
+.
+providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+.
+.
+```
+
 
 Note : c'est très important de respecter l'indentation dans les
 fichiers .yaml 
@@ -8026,17 +8150,30 @@ Pour les questions posées par l'assistant on choisira :
 
 -   **L'option** **1** pour que Symfony crée un formulaire de login de base et pas seulement le système d'authentification vide
 
--   **FormulaireLoginAuthenticator** comme nomme de la classe Guard
-    Authenticator qui prendra en charge la requête à la BD pour réaliser **l'authentification** (crée dans le dossier **src/Security**)
+-   **LoginAuthenticator** comme nomme de la classe GuardAuthenticator qui prendra en charge la requête à la BD pour réaliser **l'authentification** (crée dans le dossier **src/Security**)
 
--   **SecuriteController** comme nom du controller (actions login et
+-   **SecurityController** comme nom du controller (actions login et
     logout)
 
 -   **Oui**, car on veut que Symfony crée aussi l'URL de logout (avec l'action qui deloggera l'user, c.à.d. l'effacer de la session)
 
-Si vous vous trompez dans les options, effacez FormulaireLoginAuthenticator et le controller SecuriteController (avec ses templates) 
+Si vous vous trompez dans les options, effacez LoginAuthenticator et le controller SecurityController (avec ses templates) 
 
 Cette action met aussi à jour le fichier de configuration **config/packages/security.yaml**.
+
+```yaml
+.
+.
+        main:
+            lazy: true
+            provider: app_user_provider
+            custom_authenticator: App\Security\LoginAuthenticator
+            logout:
+                path: app_logout
+
+.
+.
+```
 
 Observez que le controller et le template ont été créés. Vous pouvez
 accéder à la vue contenant le formulaire de login en tapant la route
@@ -8057,7 +8194,7 @@ Créez une fixture pour la classe User (voir chapitre précédant sur le
 Doctrine Fixtures).
 
 ```console
-symfony composer req --dev doctrine/doctrine-fixtures-bundle
+composer require --dev orm-fixtures
 ```
 
 ```console
@@ -8145,24 +8282,27 @@ Dans **phpmyadmin** votre tableau **User** ressemblera à :
 **6**.  **Vérifier** le bon fonctionnement en tapant un couple login/pass
     valable
 
-Allez sur la page de login (par défaut l'action **login** dans **SecuriteController**) et tapez un couple *login/pass* valable. Si tout va bien vous allez obtenir... une Exception! car **dans votre controller Authenticator** (**FormulaireLoginAuthenticator** dans le dossier **src/Security**) vous n'avez pas spécifié une **Response** pour le serveur quand le login est correct.
-Ceci arrive car Symfony lance la méthode **onAuthenticationSuccess** du controller **FormulaireLoginAuthenticator** si le login est correct.
+Allez sur la page de login (par défaut l'action **login** dans **SecurityController**) et tapez un couple *login/pass* valable (ex: user "user1@lala.com" et password "lePassword"). 
+
+Si tout va bien vous allez obtenir... une Exception! car **dans votre controller Authenticator** (**LoginAuthenticator** dans le dossier **src/Security**) vous n'avez pas spécifié une **Response** pour le serveur quand le login est correct.
+Ceci arrive car Symfony lance la méthode **onAuthenticationSuccess** du controller **LoginAuthenticator** si le login est correct.
 
 ![](./images/loginredirect.png)
 
 
 Vous avez juste à implémenter cette action pour indiquer quoi faire
-dans le cas de succès (modifiez le fichier **src/Security/FormulaireLoginAuthenticator.php**). 
+dans le cas de succès (modifiez le fichier **src/Security/LoginAuthenticator.php**). 
 
 Voici un exemple :
 
 ```php
-public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
 {
-    if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
-        
+    if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
         return new RedirectResponse($targetPath);
     }
+
+    // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
 
     // nous devons charger une vue ou faire quoi qui ce soit
     // ex:
@@ -8180,6 +8320,8 @@ sera pas lancée car on fera un redirect. Ici vers une action de votre choix (ic
 
 Si une erreur de login s'est produite, **nous avons deux possibilités** pour le **traiter** :
 
+<br>
+
 **a) Utiliser le template login crée par Symfony et l'adapter à nos besoins (par défaut)**
 
 Dans cet exemple, si le couple login/pass n'est pas correct
@@ -8196,18 +8338,21 @@ anglais !
 
 À chaque essai de login c'est conseillé de lancer l'action **logout** pour effacer le contenu de la session. On parlera du logout plus bas.
 
-**b)**  Rajouter une action **onAuthenticationFailure** dans **FormulaireLoginAuthenticator.php** 
+<br>
+
+**b)**  Rajouter une action **onAuthenticationFailure** dans **LoginAuthenticator.php** 
 
 L'action **onAuthenticationFailure** sera lancée quand il à chaque erreur de login, de la même manière que **onAuthenticationSuccess** est lancée dans le cas de succès. Elle est commentée dans le code, effacez les commentaires pour que Symfony la trouve. Le comportement expliqué dans **a)** sera logiquement annulé car le code de la vue ne sera plus lancé.
 
 
 ```php
 // méthode faite par nous-mêmes. Enlevez les commentaires pour voir l'effet
-public function onAuthenticationFailure(\Symfony\Component\HttpFoundation\Request $request,
-                                    \Symfony\Component\Security\Core\Exception\AuthenticationException $exception) 
+public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
 {
-    throw new \Exception("error dans le login, c'est onAuthenticationFailure dans FormulaireLoginAuthenticator qui s'en occupe"); // rediriger, exception etc...
-}    
+    // la méthode est doit renvoyer une réponse. 
+    // à nouse de rediriger, lancer une exception ou autre...
+    return new Response ("Erreur dans le login");
+}
 ```
 
 <br>
@@ -8249,7 +8394,7 @@ L'assistant créera :
 -   Un template qui affiche le formulaire (**register.html.twig**)
 
 
-Pour pouvoir réaliser la vérification par mail on a besoin d'installer un package :
+Pour pouvoir réaliser la vérification par mail (nous n'allons pas la faire ici) on a besoin d'installer un package :
 
 ```console
 symfony composer req symfonycasts/verify-email-bundle
@@ -8274,7 +8419,7 @@ logout très facilement :
    
 Il y a deux parties à configurer: 
 
-**path**: Le **name** de l'action logout créé par Symfony dans le controller de securité (**SecuriteController**)
+**path**: Le **name** de l'action logout créé par Symfony dans le controller de securité (**SecurityController**)
 
 **target** : La **route** (pas le name!) de l'action qui sera lancée par Symfony **après** l'action de logout (qui est vide la plupart de fois)
 
@@ -8289,7 +8434,7 @@ Il y a deux parties à configurer:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\FormulaireLoginAuthenticator
+            custom_authenticator: App\Security\LoginAuthenticator
             logout:
                 path: logout
                 target: /apres/logout 
@@ -8305,22 +8450,21 @@ On doit avoir une action à lancer **après** le logout.
 1. Laissez vide l'action de logout (elle ne sera jamais lancée) et créez l'action à lancer après d'avoir fini le traitement du logout (effacer user, session etc...)
 
 **ProjetLoginPass** contient cette fonctionnalité. L'action cible se
-trouve dans **SecuriteController**.
+trouve dans **SecurityController**.
 
 ```php
-    #[Route("/logout", name:"logout")]
-    public function logout()
+    #[Route(path: '/logout', name: 'app_logout')]
+    public function logout(): void
     {
         // throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
-  
-    // target: la route à lancer APRÈS le logout 
+
     #[Route("/apres/logout")]
     public function apresLogout()
     {
-        dd("Hasta la vista, baby");
+        // on peut faire ce qu'on veut ici... ré-diriger vers le login, par exemple. 
+        return $this->redirectToRoute('app_login');
     }
-<
 ```
 
 <br>
@@ -8371,7 +8515,7 @@ Des actions d'exemple se trouvent dans le projet **ProjetLoginPass**, controller
 
 Nous allons traiter la gestion de rôles en Symfony et on va utiliser comme base le projet qu'on vient de créer, **ProjetLoginPass**. Nous voulons profiter de toute la partie d'authentification qui reste la même et qu'on ne veut pas refaire.
 
-1.  Faites une copie complete du projet **ProjetLoginPass** de github dans un dossier
+1.  Faites une copie complete du projet **ProjetLoginPass** de github dans un autre dossier
     **ProjetLoginPassRoles**
 
 2.  Changez le nom de la BD `**projetloginpassroles**. Effacez les migrations (dans le dossier Migrations, elles correspondent à l'autre projet)    
@@ -8905,7 +9049,7 @@ public function login(AuthenticationUtils $authenticationUtils, Request $req): R
 }
 ```
 
-6.  Dans le Authenticator (FormulaireLoginAuthenticator), modifiez l'action **onAuthenticationSuccess** pour qu'elle redirige vers l'accueil. Dans le template de l'accueil vous pouvez incruster les données de l'utilisateur là où vous voulez.
+6.  Dans le Authenticator (LoginAuthenticator), modifiez l'action **onAuthenticationSuccess** pour qu'elle redirige vers l'accueil. Dans le template de l'accueil vous pouvez incruster les données de l'utilisateur là où vous voulez.
 
 ```php
 public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

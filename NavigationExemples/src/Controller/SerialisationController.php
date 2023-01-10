@@ -153,7 +153,7 @@ class SerialisationController extends AbstractController
     }
 
 
-    // exemple de serialisation en utilisant un Serializer (qui inclut Normalizer + Encoder) -> json
+    // exemple de dé-serialisation en utilisant un Serializer 
     #[Route('/deserialisationAvecSerialiser')]
     public function deserialisationAvecSerialiser()
     {
