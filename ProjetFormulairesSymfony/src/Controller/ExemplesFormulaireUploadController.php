@@ -27,11 +27,14 @@ class ExemplesFormulaireUploadController extends AbstractController
         if ($formulairePays->isSubmitted() && $formulairePays->isValid()) {
             // obtenir le fichier à la main
             $fichier = $formulairePays['image']->getData();
+
+            $dossier = $this->getParameter('kernel.project_dir').'/public/dossierFichiers';
+
             if ($fichier) {
                 // obtenir un nom de fichier unique pour éviter les doublons dans le dossier
                 $nomFichierServeur = md5(uniqid()) . "." . $fichier->guessExtension();
                 // stocker le fichier dans le serveur (on peut indiquer un dossier)
-                $fichier->move("dossierFichiers", $nomFichierServeur);
+                $fichier->move($dossier, $nomFichierServeur);
                 // affecter le nom du fichier de l'entité. Ça sera le nom qu'on
                 // aura dans la BD (un string, pas un objet UploadedFile cette fois)
                 $pays->setImage($nomFichierServeur);
