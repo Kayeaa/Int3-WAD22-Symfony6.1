@@ -8469,18 +8469,19 @@ trouve dans **SecurityController**.
 
 <br>
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # 25. Accès à l'objet app.user
 
 Si vous utilisez le système d'authentication de Symfony, une fois l'utilisateur est connecté vous pouvez obtenir son objet **User** associé :
 
-1.  Dans le controller
+**1.**  Dans le controller
 
 ```php
 $this->getUser()
 ```
 
-1.  Dans la vue
+**2.**  Dans la vue
 
 ```twig
 app.user
@@ -8515,10 +8516,9 @@ Des actions d'exemple se trouvent dans le projet **ProjetLoginPass**, controller
 
 Nous allons traiter la gestion de rôles en Symfony et on va utiliser comme base le projet qu'on vient de créer, **ProjetLoginPass**. Nous voulons profiter de toute la partie d'authentification qui reste la même et qu'on ne veut pas refaire.
 
-1.  Faites une copie complete du projet **ProjetLoginPass** de github dans un autre dossier
-    **ProjetLoginPassRoles**
+1.  Faites une copie complete du projet **ProjetLoginPass** de github dans un autre dossier **ProjetLoginPassRoles**
 
-2.  Changez le nom de la BD `**projetloginpassroles**. Effacez les migrations (dans le dossier Migrations, elles correspondent à l'autre projet)    
+2.  Changez le nom de la BD dans .env à **projetLoginPassRoles**. Effacez les migrations (dans le dossier **migrations**, elles correspondent à l'autre projet)    
 
 3.  Juste pour enrichir le projet et montrer que c'est faisable, rajouter une propriété **nom** à l'entité User
 
@@ -8564,16 +8564,16 @@ label: 'Password'
 
 
 Vous pouvez tester ce formulaire. Il manque uniquement la fonctionnalité
-de rajouter de rôles mais on ne la fera pas ça ici. Vous pouvez toujours éditer les rôles plus tard à la main ou en utilisant la méthode **setRoles** de l'entité!
+de rajouter de rôles mais on la fera plus tard. Vous pouvez toujours éditer les rôles plus tard à la main ou en utilisant la méthode **setRoles** de l'entité!
 
-6.  Créez et migrez la BD
+1.  Créez et migrez la BD
 ```php
 symfony console doctrine:database:create
 symfony console make:migration
 symfony console doctrine:migrations:migrate
 ```
 
-7.  Remplacez la fixture par celle-ci, qui rajoute des Users avec de
+2.  Remplacez la fixture par celle-ci, qui rajoute des Users avec de
     rôles (comprenez le code!)
 
 
@@ -8642,7 +8642,7 @@ symfony console doctrine:fixtures:load
 
 ## 26.2. Contrôle d'accès par rôles
 
-Puis vous pouvez restreindre l'accès à certains rôles de trois manières :
+Puis vous pouvez restreindre l'accès à un User possedant certains rôles de trois manières :
 
 1.  dans **security.yaml**
 
@@ -8688,6 +8688,8 @@ class GestionController extends AbstractController
 }
 ```
 
+Voici un exemple de code pour action 1, qui afficher les rôles de l'utilisateur connecté actuellement.
+
 ```twig
 {% extends 'base.html.twig' %}
 
@@ -8704,24 +8706,23 @@ Voici action 1
 
 2.  **Créez les restrictions dans security.yaml**
 
-    Les deux actions de ce controller doivent être uniquement par un
-    utilisateur ayant le role ROLE_GESTIONNAIRE. C'est dans
+    Les deux actions de ce controller doivent être accésibles uniquement par un utilisateur ayant le role ROLE_ADMIN. C'est dans
     **security.yaml** qu'on a fixé cette restriction :
 
 ```yaml
 access_control:
-        - { path: ^/gestion, roles: [ROLE_GESTIONNAIRE] }
+        - { path: ^/gestion, roles: [ROLE_ADMIN] }
 ```
 
 Faites logout. Faites login avec un user de chaque type (regardez la
-BD) et essayez de lancer les actions gestion/action1 et gestion/action2 (depuis l'URL). Observez les résultats selon l'user qui est connecté : seulement les users ayant le ROLE_GESTIONNAIRE pourront lancer ces actions. Les autres obtiennent une exception **Access Denied**
+BD) et essayez de lancer les actions gestion/action1 et gestion/action2 (depuis l'URL). Observez les résultats selon l'user qui est connecté : seulement les users ayant le ROLE_ADMIN pourront lancer ces actions. Les autres obtiennent une exception **Access Denied**
 
 
 <br>
 
 ### 26.2.2. Dans le controller
 
-Si on ne veut pas créer de restrictions par routes, on peut tout simplement **vérifier si l'utilisateur qui est connecté possède le rôle demandé**.
+Si on ne veut pas créer de restrictions par routes dans **security.yaml**, on peut tout simplement **vérifier si l'utilisateur qui est connecté possède le rôle demandé**.
 La façon la plus simple est d'utiliser des **annotations pour l'action** (@IsGranted ou encore mieux, **@Security**. Regardez des exemples ici: 
 
 https://symfony.com/bundles/SensioFrameworkExtraBundle/current/annotations/security.html
@@ -8729,6 +8730,16 @@ https://symfony.com/bundles/SensioFrameworkExtraBundle/current/annotations/secur
 
 Si l'utilisateur ne possède pas le rôle fixé dans l'action, **une exception sera lancée.** Pour tester le bon fonctionnement faites d'abord logout. Faites login avec un user de chaque type (regardez la BD) et essayez de lancer les actions *autre/action1* et *autre/action2* (depuis l'URL). Observez les résultats selon l'user qui est connecté.
 
+
+```php
+    // exemple de contrôle d'accès en utilisant IsGranted (ici on a utilisé un attribut PHP, pas une annotation. Le résultat est le même)
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route("/gestion/action2")]
+    public function action2()
+    {
+        return $this->render('gestion/action2.html.twig');
+    }
+```
 <br>
 
 ### 26.2.3. Restriction d'accès dans la vue
