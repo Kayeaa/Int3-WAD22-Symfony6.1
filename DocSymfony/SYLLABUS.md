@@ -67,6 +67,7 @@
   - [10.6. Utiliser un service dans un autre service](#106-utiliser-un-service-dans-un-autre-service)
   - [10.7. Accéder au modèle dans un Service](#107-accéder-au-modèle-dans-un-service)
   - [10.8. Injection de paramètres dans le service (II)](#108-injection-de-paramètres-dans-le-service-ii)
+- [10.9. Exemple: création d'un service pour uploader des fichiers](#109-exemple-création-dun-service-pour-uploader-des-fichiers)
 - [11. Le Modèle](#11-le-modèle)
   - [11.1. Présentation de Doctrine](#111-présentation-de-doctrine)
   - [11.2. Installation de Doctrine dans un projet](#112-installation-de-doctrine-dans-un-projet)
@@ -156,11 +157,11 @@
     - [Exercices : utilisation d'AJAX Vanilla](#exercices--utilisation-dajax-vanilla)
   - [21.19. DateTime et datepicker (Bootstrap)](#2119-datetime-et-datepicker-bootstrap)
 - [22. Response JSON en Symfony](#22-response-json-en-symfony)
-  - [22.1. Renvoi JSON d'un array d'objets obtenu avec les méthodes d'un repo](#221-renvoi-json-dun-array-dobjets-obtenu-avec-les-méthodes-dun-repo)
+  - [22.1. Renvoi JSON d'un array d'objets depuis le controller](#221-renvoi-json-dun-array-dobjets-depuis-le-controller)
   - [22.2. Renvoi JSON d'un array d'objets obtenu avec DQL](#222-renvoi-json-dun-array-dobjets-obtenu-avec-dql)
 - [23. Mail](#23-mail)
 - [24. Authentification : inscription et login/password](#24-authentification--inscription-et-loginpassword)
-  - [24.1. Configuration de la sécurité et création d'un formulaire de login](#241-configuration-de-la-sécurité-et-création-dun-formulaire-de-login)
+  - [2.4.1. Configuration de la sécurité et création d'un formulaire de login](#241-configuration-de-la-sécurité-et-création-dun-formulaire-de-login)
   - [24.2. Création d'un formulaire d'inscription](#242-création-dun-formulaire-dinscription)
   - [24.3. Logout](#243-logout)
 - [25. Accès à l'objet app.user](#25-accès-à-lobjet-appuser)
@@ -254,7 +255,7 @@ Installez le client Symfony (équivalent à symfony.exe en Windows):
 brew install symfony-cli/tap/symfony-cli
 ```
 
-Si cette procedure ne fonctionne pas, téléchargez le client de GitHub
+Si cette procédure ne fonctionne pas, téléchargez le client de GitHub
 
 
 ```console
@@ -2570,6 +2571,7 @@ class ExemplesPropreServiceController extends AbstractController
 
 Créez à partir de zéro un service qui dit Bonjour. Le service portera le nom *BonjourSimple*. Créez une action pour montrer son fonctionnement
 
+
 <br>
 
 ## 10.4. Injecter les services dans le controller
@@ -2787,6 +2789,8 @@ class ExemplesServiceUtiliseService extends AbstractController
 
 ## 10.7. Accéder au modèle dans un Service
 
+<br>
+
 C'est exactement la même chose que la section précédente, mais vu que c'est une opération fréquente, on met un exemple ici.
 Le service à injecter est **EntityManagerInterface**... et voilà!
 
@@ -2944,7 +2948,133 @@ le fichier **services.yaml** :
 
 Si on voulait **changer l'adresse** on peut toujours créer de méthodes pour ce faire dans notre service, **rien nous empêche de créer une méthode pour ce faire dans notre service**. On vient d'arranger le problème d'avoir la valeur lors la création du service. En plus, le code reste plus propre car les paramètres de tous nos services seront centralisés dans **services.yaml**
 
+
 <br><br>
+
+
+# 10.9. Exemple: création d'un service pour uploader des fichiers
+
+Dans cette section on va créer un service capable de réaliser l'upload d'un fichier. 
+
+Vous avez besoin de comprendre d'abord le mécanisme d'upload de fichiers. Allez dans la section correspondante du syllabus (voir index)
+
+Pourquoi créer un service pour l'upload? Car le code pour faire un upload est long, et on ne veut pas le répéter dans chaque action de l'application qui a besoin de faire upload (ex: les actions de créer un utilisateur et de le mettre à jour son profile ont toutes les deux besoin de cette fonctionnalité)
+
+Voici la procédure:
+
+Ouvrez le projet ProjetFormulairesSymfony et le controller ExemplesFormulaireUploadController. Dans l'action **upload** du controller on a tout ce dont on a besoin.
+
+Nous allons créer un Service qui contiendra basiquement le même code.
+
+Le service doit: 
+- recevoir l'objet UploadFile pour le stocker dans le serveur. 
+- renvoyer le nom (string) crée pour le fichier (celui qui apparaitra dans la BD)
+
+```php
+<?php
+namespace App\Service;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+class UploadHelper
+{
+    private string $dossierUpload;
+
+    public function __construct (string $dossierUpload){
+        $this->dossierUpload = $dossierUpload;
+    }
+
+    public function uploadImagePays(UploadedFile $fichier): string
+    {
+
+        // obtenir un nom de fichier unique pour éviter les doublons dans le dossierUpload
+        $nomFichierServeur = md5(uniqid()) . "." . $fichier->guessExtension();
+        // stocker le fichier dans le serveur (on peut préciser encore plus le dossier)
+        $fichier->move($this->dossierUpload . "/pays", $nomFichierServeur);
+        return $nomFichierServeur;
+    }
+}
+```
+
+Voici l'action du controller qui fait appel au service:
+
+```php
+#[Route("/exemples/formulaire/upload/avec/service/exemple")]
+public function uploadAvecService (Request $request, ManagerRegistry $doctrine, UploadHelper $uploader)
+{
+
+    // créer une nouvelle entité vide
+    $pays = new Pays();
+    // créer un formulaire associé à cette entité
+    $formulairePays = $this->createForm(PaysType::class, $pays);
+    // gérer la requête (et hydrater l'entité)
+    $formulairePays->handleRequest($request);
+    // vérifier que le formulaire a été envoyé (isSubmitted) et que les données sont valides
+    if ($formulairePays->isSubmitted() && $formulairePays->isValid()) {
+        // obtenir le fichier à la main
+        $fichier = $formulairePays['image']->getData();
+
+        if ($fichier) {
+            $nomFichierServeur = $uploader->uploadImagePays($fichier);
+            $pays->setImage($nomFichierServeur);
+        }
+        // stocker l'objet dans la BD, ou faire update
+        $em = $doctrine->getManager();
+        $em->persist($pays);
+        $em->flush();
+        return new Response("Entité mise à jour dans la BD. Si le fichier a été selectionné, upload ok!");
+    } else {
+        return $this->render(
+            "/exemples_formulaires_upload/affichage.html.twig",
+            ['formulaire' => $formulairePays->createView()]
+        );
+    }
+}
+```
+Le code est plus propre car la logique de l'upload est séparée dans un Service. Ce n'est pas seulement une question de s'épargner des lignes de code, mais de clarté.
+
+On peut recycler pratiquement tout notre code pour créer une action d'edit pour l'entité Pays:
+
+```php
+#[Route("/exemples/formulaire/upload/avec/service/{id}/edit")]
+public function uploadAvecServiceEdit (Pays $pays, Request $request, ManagerRegistry $doctrine, UploadHelper $uploader)
+{
+    // créer une nouvelle entité vide... pas besoin! on reçcoit l'entité à modifier
+    // $pays = new Pays();
+
+    // ParamConverter prend l'id de la route et obtient le Pays de la BD. On peut faire appel à cette action depuis un lien "update", par exemple
+    // http://localhost:8000/exemples/formulaire/upload/avec/service/7/edit ("7" est l'id de l'entité dans la BD) 
+
+    // créer un formulaire associé à cette entité
+    $formulairePays = $this->createForm(PaysType::class, $pays);
+    // gérer la requête (et hydrater l'entité)
+    $formulairePays->handleRequest($request);
+    // vérifier que le formulaire a été envoyé (isSubmitted) et que les données sont valides
+    if ($formulairePays->isSubmitted() && $formulairePays->isValid()) {
+        // obtenir le fichier à la main
+        $fichier = $formulairePays['image']->getData();
+
+
+        if ($fichier) {
+            $nomFichierServeur = $uploader->uploadImagePays($fichier);
+            $pays->setImage($nomFichierServeur);
+        }
+        // stocker l'objet dans la BD, ou faire update
+        $em = $doctrine->getManager();
+        // $em->persist($pays);  // pas besoin
+        $em->flush();
+        return new Response("Entité mise à jour dans la BD. Si le fichier a été selectionné, upload ok!");
+    } else {
+        return $this->render(
+            "/exemples_formulaires_upload/affichage.html.twig",
+            ['formulaire' => $formulairePays->createView()]
+        );
+    }
+}
+```
+
+<br>
+
 
 # 11. Le Modèle
 
@@ -4124,7 +4254,7 @@ Voyons quelques exemples d'insertion et mise à jour à continuation.
 <br>
 
 Pour réaliser un UPDATE on doit d'abord obtenir un objet de la BD.
-La procedure est simple :
+La procédure est simple :
 
 - Obtenir un objet en utilisant une requête de selection (ex: find, findBy, findOneBy, findAll ou votre propre méthode)
 - Modifier l'objet (ex: $livre1->setTitre("1984"))
@@ -5650,6 +5780,8 @@ dd($query->getSql());
 
 <br>
 
+
+
 # 21. Formulaires en Symfony
 
 Un formulaire est un ensemble d'éléments HTML dont leur contenu est envoyé au serveur (**action**) en exécutant un **submit**. Les infos sont traitées par un serveur. Le serveur reçoit une requête **POST** ou **GET** qui contient les contenus des éléments du formulaire. En PHP, ces contenus sont accessibles à partir de la variable $_POST ou $_GET.
@@ -5982,16 +6114,16 @@ On va s'entrainer en créant un formulaire plus personnalisé que le précédent
 Faites la migration.
 
 
-1. **Créez un formulaire** (LivreType) basé sur Livre (prenez comme exemple celui de l'entité Aeroport) et **rajoutez les types pour chaque champ**. 
+**1.** **Créez un formulaire** (LivreType) basé sur Livre (prenez comme exemple celui de l'entité Aeroport) et **rajoutez les types pour chaque champ**. 
 
-**Toutes les informations nécessaires sur les types se trouvent ici :**
+Toutes les informations nécessaires sur les types se trouvent ici :
 
 <https://symfony.com/doc/current/reference/forms/types.html>
 
 
 Avant de créer une action pour générer ce formulaire on va rajouter la méthode et l'action dans la section suivante.
 
-2. **Méthode et Action**
+**2.** **Définition pour la méthode et l'action**
 
 Pour le moment on va rajouter un bouton d'action même si **on fera le traitement uniquement dans la section suivante**
 
@@ -6019,6 +6151,8 @@ On **doit spécifier l'action à réaliser par le submit** (même avant créer l
 
 }
 ```
+
+<br>
 
 **b)**  **L'action et la méthode sont definies dans le controller** lors de la création de l'objet formulaire avec les options de **createForm**. Cette option est **plus souple** car elle nous permet de réutiliser le formulaire pour lancer d'autres actions :
 
@@ -6056,9 +6190,11 @@ Nous pouvons définir l'action et la méthode dans la vue :
 {{ form_end (formulaireLivre) }}
 ```
 
+<br>
 
 ### 21.4.1. Les boutons... où les mettre?
 
+<br>
 
 Si on veut réutiliser un même formulaire pour réaliser plusieurs actions (ex : mettre à jour un livre ou rajouter un livre) **on peut créer les boutons dans la vue où on génère le form**. 
 
@@ -6457,8 +6593,12 @@ public function rajouterLivre(Request $req, ManagerRegistry $doctrine)
 
 2. Créez une entité *Client* (probablement elle existe déjà dans votre projet). Créez un formulaire et testez-le avec une action et une vue.
 
+<br>
+
 
 ## 21.8. Exemple de traitement avec CRUD - UPDATE
+
+<br>
 
 Nous avons une action qui génère une liste de Livres. Quand on clique sur un Livre on verra les détails du Livre sous la forme d'un form. On peut éditer le form et les données seront stockées.
 
@@ -6856,6 +6996,7 @@ Faites la migration.
 
 ```php
 <?php
+
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -6866,12 +7007,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PaysType extends AbstractType
 {
-   
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('nom', TextType::class)
-                ->add('lienImage', FileType::class , array ('label'=>"Sélectionner l'image du pays"));
-        
+            ->add('image', FileType::class, [
+                'label' => "Sélectionner l'image du pays",
+                'mapped' => false, // cette propriété ne sera pas affecté dans l'entité quand on envoie le formulaire. On la récuperera avec $form['image']->getData()
+                'required' => false // l'utilisateur n'est pas obligé d'uploader un fichier
+            ]);
     }
 }
 ```
@@ -6915,6 +7059,7 @@ Voici le code de l'action (**ExemplesFormulaireUploadController**):
 
 ```php
 <?php
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -6924,40 +7069,47 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Pays;
 use App\Form\PaysType;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
+
 
 class ExemplesFormulaireUploadController extends AbstractController
 {
-    #[Route ("/exemples/formulaire/upload/exemple")]
-    public function exemple (Request $request){
+    #[Route("/exemples/formulaire/upload/exemple")]
+    public function upload (Request $request, ManagerRegistry $doctrine)
+    {
         // créer une nouvelle entité vide
         $pays = new Pays();
         // créer un formulaire associé à cette entité
-        $formulairePays = $this->createForm (PaysType::class, $pays);
+        $formulairePays = $this->createForm(PaysType::class, $pays);
         // gérer la requête (et hydrater l'entité)
         $formulairePays->handleRequest($request);
         // vérifier que le formulaire a été envoyé (isSubmitted) et que les données sont valides
-        if ($formulairePays->isSubmitted() && $formulairePays->isValid()){
-            // obtenir le fichier (pas un "string" mais un objet de la class UploadedFile)
-            $fichier = $pays->getLienImage();
-            // obtenir un nom de fichier unique pour éviter les doublons dans le dossier
-            $nomFichierServeur = md5(uniqid()).".".$fichier->guessExtension();
-            // stocker le fichier dans le serveur (on peut indiquer un dossier)
-            $fichier->move ("dossierFichiers", $nomFichierServeur);
-            // affecter le nom du fichier de l'entité. Ça sera le nom qu'on
-            // aura dans la BD (un string, pas un objet UploadedFile cette fois)
-            $pays->setLienImage($nomFichierServeur);
+        if ($formulairePays->isSubmitted() && $formulairePays->isValid()) {
+            // obtenir le fichier à la main
+            $fichier = $formulairePays['image']->getData();
 
+            $dossier = $this->getParameter('kernel.project_dir').'/public/dossierFichiers';
+
+            if ($fichier) {
+                // obtenir un nom de fichier unique pour éviter les doublons dans le dossier
+                $nomFichierServeur = md5(uniqid()) . "." . $fichier->guessExtension();
+                // stocker le fichier dans le serveur (on peut indiquer un dossier)
+                $fichier->move($dossier, $nomFichierServeur);
+                // affecter le nom du fichier de l'entité. Ça sera le nom qu'on
+                // aura dans la BD (un string, pas un objet UploadedFile cette fois)
+                $pays->setImage($nomFichierServeur);
+            }
             // stocker l'objet dans la BD, ou faire update
             $em = $doctrine->getManager();
             $em->persist($pays);
             $em->flush();
-            return new Response ("fichier uploaded et BD mise à jour!");
+            return new Response("Entité mise à jour dans la BD. Si le fichier a été selectionné, upload ok!");
+        } else {
+            return $this->render(
+                "/exemples_formulaires_upload/affichage.html.twig",
+                ['formulaire' => $formulairePays->createView()]
+            );
         }
-        else {
-            return $this->render ("/exemples_formulaires_upload/affichage.html.twig",
-                    ['formulaire'=> $formulairePays->createView()]);
-        }
-
     }
 }
 ```
@@ -7140,7 +7292,7 @@ Tous les points importants sont commentés.
 
 Le but ici est d'avoir un formulaire associé à une entité . Une fois il est envoyé on disposera directement d'une entité dans le controller, remplie avec les données du formulaire.
 
-C'est la procedure normale, mais plus élaborée à cause d'avoir utilisé AJAX et FormData
+C'est la procédure normale, mais plus élaborée à cause d'avoir utilisé AJAX et FormData
 
 #### Explication de base:
 
@@ -7629,6 +7781,8 @@ public function exemple1Traitement(Request $requeteAjax)
 
 ## 21.18. Utilisation de blocs dans twig avec AJAX (Vanilla)
 
+<br>
+
 Il s'agit juste d'une combinaison de master page + AJAX, rien de
 nouveau.
 
@@ -7758,6 +7912,9 @@ ExemplesAjaxController)**
 
 ## 21.19. DateTime et datepicker (Bootstrap)
 
+
+<br>
+
 Si vous utilisez **datepicker** de Bootstrap, vous devez mettre d'accord le format de l'objet du formulaire et celui du datepicker, qui ne s'expriment pas de la même façon. Ça peut devenir horrible mais voici une façon directe de faire si vous utilisez un format standard.
 
 Dans la vue, avec l'objet **datepicker**:
@@ -7782,14 +7939,14 @@ Dans le controller, dans le **formulaire**:
 Observez que pour exprimer la même chose on doit utiliser deux encodages différents.
 **format** dans le formulaire exprime le format qui est attendu par Symfony pour créer l'objet DateTime. On a exprimé la même chose dans **datepicker**, mais le plugin et le framework utilisent des normes différentes!
 
-
+<br>
 
 
 # 22. Response JSON en Symfony
 
 <br>
 
-## 22.1. Renvoi JSON d'un array d'objets obtenu avec les méthodes d'un repo  
+## 22.1. Renvoi JSON d'un array d'objets depuis le controller 
 
 <br>
 
@@ -7931,7 +8088,9 @@ class MailController extends AbstractController
 
 Créez un projet **ProjetLoginPass**.
 
-## 24.1. Configuration de la sécurité et création d'un formulaire de login
+<br>
+
+## 2.4.1. Configuration de la sécurité et création d'un formulaire de login
 
 <br>
 
@@ -7965,7 +8124,7 @@ On va réaliser une configuration de base de la sécurité pour pouvoir créer u
 --
 <br>
 
-**Voici la procedure**: 
+**Voici la procédure**: 
 
 **1**.  **Installer le support de sécurité dans le projet**
 
@@ -8909,7 +9068,7 @@ C'est ici où on inclura notre template de login login.html.twig, mais adapté a
 Pour ce faire on a besoin d'AJAX. Pour nous faciliter la tâche on utilisera Axios. 
 
 
-**Voici la procédure pour la création de la fenêtre modale si vous voulez l'utiliser dans un projet**. Sachant que la procedure dépend fortement du template à utiliser, on montre une procédure générique.
+**Voici la procédure pour la création de la fenêtre modale si vous voulez l'utiliser dans un projet**. Sachant que la procédure dépend fortement du template à utiliser, on montre une procédure générique.
 
 
 1. Inclure la vue **login.html.twig** créé par Symfony là où se trouve le code de la fenêtre modale. Remplacez le code original de la fenêtre modale (ex: un div quelque par  dans le template). Utilisez include (twig) dans ce div pour inclure *login.html.twig*. 
@@ -9315,7 +9474,7 @@ Vous pouvez carrement rajouter de fichiers .js et donner un nom pour l'entry:
     .addEntry('exemple1AjaxFormData','./assets/exemple1AjaxFormData.js')
     .addEntry('autreJs','./assets/autreJs.js')
 ```
-Puis vous **copiez votre fichier .js dans l'emplacement que vous avez indiquez dans l'Entry**. Cette procedure va indiquer à Webpack quels seront les fichiers .js qu'on va avoir dans notre app.
+Puis vous **copiez votre fichier .js dans l'emplacement que vous avez indiquez dans l'Entry**. Cette procédure va indiquer à Webpack quels seront les fichiers .js qu'on va avoir dans notre app.
 
 Continuez pour savoir comment les utiliser dans vos vues.
 
