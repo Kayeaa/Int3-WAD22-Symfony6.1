@@ -8680,11 +8680,6 @@ class GestionController extends AbstractController
     {
         return $this->render('gestion/action1.html.twig');
     }
-    #[Route("/gestion/action2")]
-    public function action2()
-    {
-        return $this->render('gestion/action2.html.twig');
-    }
 }
 ```
 
@@ -8740,6 +8735,8 @@ Si l'utilisateur ne possède pas le rôle fixé dans l'action, **une exception s
         return $this->render('gestion/action2.html.twig');
     }
 ```
+Créez la vue pour l'action2 (juste copiez-collez celui de l'action1)
+
 <br>
 
 ### 26.2.3. Restriction d'accès dans la vue
@@ -8751,15 +8748,17 @@ en utilisant **is_granted**.
 Créez une nouvelle action **action 3** qui ne limite pas par rôle :
 
 ```php
-#[Route("/autre/action3")]
+// exemple de contrôle d'accès dans la vue
+#[Route("/gestion/action3")]
 public function action3()
 {
     // cette fois on va controller l'accès dans la vue
-    return $this->render('autre/action3.html.twig');
+    return $this->render('gestion/action3.html.twig');
 }
+
 ```
 
-Et contrôlez le rôle dans la vue :
+Et contrôlez le rôle dans la vue (action3.html.twig):
 
 ```twig
 {% extends 'base.html.twig' %}
@@ -8797,7 +8796,6 @@ Ici on va traiter le deuxième cas de figure :
 
 ```php
 <?php 
-<?php
 // src/Security/AccessDeniedHandler.php
 namespace App\Security;
 
