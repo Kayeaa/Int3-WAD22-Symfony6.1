@@ -116,11 +116,5 @@ class ExemplesFormulairesController extends AbstractController
         return $this->render('/exemples_formulaires/exemple_livre.html.twig', $vars);
     }
 
-    #[Route("/exemples/formulaires/exemple/livre/rajouter",name:"rajouter_livre")]
-    public function rajouterLivre()
-    {
 
-        dump("je rajoute un livre");
-        die();
-    }
 }

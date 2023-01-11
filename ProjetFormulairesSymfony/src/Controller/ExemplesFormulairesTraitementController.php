@@ -32,7 +32,7 @@ class ExemplesFormulairesTraitementController extends AbstractController
         $formulaireLivre = $this->createForm(
             LivreType::class,
             $livre
-            // on n'a pas besoin d'action ni de méthode ici: si un form n'a pas d'action on fait appel à la même page
+            // on n'a pas besoin d'action ni de méthode ici: si un form n'a pas d'action on fait appel à la même action
             // ,
             // [
             //     'action' => $this->generateUrl("exemple_livre"),

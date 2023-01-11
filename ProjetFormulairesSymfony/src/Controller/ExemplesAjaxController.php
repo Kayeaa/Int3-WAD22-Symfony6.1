@@ -74,9 +74,6 @@ class ExemplesAjaxController extends AbstractController
 
 
     // AJAX avec des arrays d'objets
-    //    
-    //    
-
     #[Route("/exemples/ajax/exemple/renvoi/entite")]
 
     // on affiche un input pour chercher les livres qui portent un titre

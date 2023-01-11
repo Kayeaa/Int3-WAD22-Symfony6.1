@@ -67,7 +67,7 @@
   - [10.6. Utiliser un service dans un autre service](#106-utiliser-un-service-dans-un-autre-service)
   - [10.7. Accéder au modèle dans un Service](#107-accéder-au-modèle-dans-un-service)
   - [10.8. Injection de paramètres dans le service (II)](#108-injection-de-paramètres-dans-le-service-ii)
-- [10.9. Exemple: création d'un service pour uploader des fichiers](#109-exemple-création-dun-service-pour-uploader-des-fichiers)
+  - [10.9. Cas pratique: création d'un service pour uploader des fichiers](#109-cas-pratique-création-dun-service-pour-uploader-des-fichiers)
 - [11. Le Modèle](#11-le-modèle)
   - [11.1. Présentation de Doctrine](#111-présentation-de-doctrine)
   - [11.2. Installation de Doctrine dans un projet](#112-installation-de-doctrine-dans-un-projet)
@@ -83,8 +83,6 @@
     - [Exercices : création d'une relation de plusieurs à plusieurs](#exercices--création-dune-relation-de-plusieurs-à-plusieurs)
     - [11.6.4. Relation One-To-One](#1164-relation-one-to-one)
     - [11.6.5. Relation réflexive (self-association)](#1165-relation-réflexive-self-association)
-      - [a) Relation réflexive d'un à plusieurs](#a-relation-réflexive-dun-à-plusieurs)
-      - [b) Relation récursive de plusieurs à plusieurs](#b-relation-récursive-de-plusieurs-à-plusieurs)
 - [12. Le modèle : accès à la BD avec Doctrine](#12-le-modèle--accès-à-la-bd-avec-doctrine)
   - [12.1. INSERT](#121-insert)
   - [12.2. SELECT](#122-select)
@@ -2952,7 +2950,7 @@ Si on voulait **changer l'adresse** on peut toujours créer de méthodes pour ce
 <br><br>
 
 
-# 10.9. Exemple: création d'un service pour uploader des fichiers
+## 10.9. Cas pratique: création d'un service pour uploader des fichiers
 
 Dans cette section on va créer un service capable de réaliser l'upload d'un fichier. 
 
@@ -3783,7 +3781,8 @@ L'utilisateur_id est lié (FK) à l'id du client
 ### 11.6.5. Relation réflexive (self-association)
 
 <br>
-#### a) Relation réflexive d'un à plusieurs
+
+**a) Relation réflexive d'un à plusieurs**
 
 Nous pouvons aussi implémenter une entité qui a une référence à
 soi-même. L'exemple le plus typique est celui des parents-enfants ou
@@ -3865,7 +3864,7 @@ Dans le code PHP (Categorie.php) on obtient deux listes, une pour les sous-caté
 
 <br>
 
-#### b) Relation récursive de plusieurs à plusieurs
+**b) Relation réflexive de plusieurs à plusieurs**
 
 
 Si la relation est de **plusieurs à plusieurs sans attributs** (ex. : un employé qui supervise plusieurs employés, et qui est à son tour supervisé par d'autres employés), on peut utiliser une **relation many-to-many** **si on n'a pas d'attributs dans la relation**.
@@ -6380,7 +6379,7 @@ class ExemplesFormulairesTraitementController extends AbstractController
         $formulaireLivre = $this->createForm(
             LivreType::class,
             $livre
-            // on n'a pas besoin d'action ni de méthode ici: si un form n'a pas d'action on fait appel à la même page
+            // on n'a pas besoin d'action ni de méthode ici: si un form n'a pas d'action on fait appel à la même action
             // ,
             // [
             //     'action' => $this->generateUrl("exemple_livre"),
@@ -6463,7 +6462,7 @@ L'action ci-dessus
 ```
 
 
-1.  **Classe du formulaire**
+Voici la **Classe du formulaire**
 
 ```php
 <?php
@@ -7021,7 +7020,7 @@ class PaysType extends AbstractType
 ```
 
 
-4.  Créez **un fichier twig capable d'afficher ce formulaire**
+3.  Créez **un fichier twig capable d'afficher ce formulaire**
 
 ```twig
 {# affichage_formulaire upload.html.twig #}
@@ -7031,7 +7030,7 @@ class PaysType extends AbstractType
 {{ form_end (formulaire) }}
 ```
 
-5.  Créez **une action qui traite les données envoyées par le
+4.  Créez **une action qui traite les données envoyées par le
     formulaire**
 
 Cette action doit :
@@ -8628,7 +8627,6 @@ trouve dans **SecurityController**.
 
 <br>
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # 25. Accès à l'objet app.user
 
