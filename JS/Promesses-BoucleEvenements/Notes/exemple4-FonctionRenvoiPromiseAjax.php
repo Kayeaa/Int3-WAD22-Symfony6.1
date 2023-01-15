@@ -10,16 +10,18 @@
 
 <body>
     <script>
-        // on n'envoie pas un callback! on définira quoi faire avec le 
-        // résultat de l'appel AJAX plus tard
+        // Si on veut généraliser le code pour pouvoir 
+        // faire appel à une URL de notre choix,
+        // on peut juste créer une fonction qui reçoit 
+        // l'URL et renvoie la promesse "personnalisée"
 
         // La fonction appelAjax n'utilise pas le résultat 
-        // de l'appel AJAX elle même en appellant un callback
+        // de l'appel AJAX elle même 
 
         // appelAJAX crée et renvoie un promesse qui: 
         // - fait l'appel AJAX 
         // - fixe les résultats por resolve (succés) et reject (échec)
-        // resolve et reject sont définies plus tard (then y catch)
+        // resolve et reject sont définies plus tard (then)
 
         const appelAjax = (url) => {
 
@@ -55,20 +57,30 @@
         // exemple base pour afficher juste le film
         let idFilm = 1; // on le fixe, ça peut venir de n'importe où
 
-        // consommation de la promesse!
+        // consommation de la promesse pour obtenir
+        // uniquement le film
         appelAjax("./obtenirFilm.php?id=" + idFilm)
-            .then((resAjax) => { // le then est lancé si on fait appel à resolve
-                console.log(resAjax);
-            })
-            .catch((res) => { // le catch est lancé si on fait appel à reject
-                console.log("erreur!");
-            });
+            .then(
+                (resAjax) => {
+                    console.log(resAjax);
+                },
+                (resReject) => {
+                    console.log("erreur!");
+                })
+            .catch(
+                (erreur) => {
+                    // le catch est lancé si on fait appel à reject 
+                    // et on n'a pas défini une fonction onReject 
+                    // dans le then (ce cas!), ou si une autre erreur s'est produite
+                    console.log ("erreur capturé par catch");
+                    console.log (erreur);
+                }
+            );
 
 
+        // consommation de la promesse pour obtenir
         // obtenir tous le films du même genre que le film choisi.
-        // mieux que l'exemple1 original, mais encore sujet au callback hell
-
-        // consommation de la promesse. Callback hell eliminé
+        // Au revoir Callback Hell!
         appelAjax("./obtenirFilm.php?id=" + idFilm)
             .then((idGenre) => {
                 return appelAjax("./obtenirTousFilmsGenre.php?idGenre=" + idGenre);
@@ -86,8 +98,8 @@
         // .then ()
         // .then ()
         // .then .....
-        // .catch((resultatReject) => {
-        //     console.log(resultatReject);
+        // .catch((error) => {
+        //     console.log(error);
         // });
     </script>
 </body>

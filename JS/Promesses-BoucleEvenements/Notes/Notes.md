@@ -156,21 +156,20 @@ getData("https://example.com/page1.php", function(data1) {
 Une **promise** (promesse) est un objet qui: 
 
 - **surveille la finalisation d’un certain événement asynchrone** (timer, AJAX, accès à une BD, etc…) dans l’application et
-- **détermine quoi faire après cette finalisation** de l'action asynchrone
-  
+- **détermine quoi faire après cette finalisation** de l'action asynchrone 
 
-La promesse détermine quoi faire avec une valeur qu’on recevra dans le futur (ex: données d'une API, données d'un BD de la propre app...) et qui sera le résultat de l’événement.  
+**La promesse détermine quoi faire avec une valeur qu’on recevra dans le futur** (ex: données d'une API, données d'un BD de la propre app...)  
 
-**Exemple :** demander la transformation d'une image qui se trouve dans le serveur. Quand l’image sera transformée et reçcue, une action sera réalisée (resolve). Si la demande échoue, une autre action sera lancée (reject) 
+**Exemple:** demander la transformation d'une image qui se trouve dans le serveur. Quand l’image sera transformée et reçue, une action sera réalisée (resolve). Si la demande échoue, une autre action sera lancée (reject) 
 
 Une promese peut se trouver dans les états suivants : 
 
-1. *Pending* - en attente
-2. *Settled* - elle a fini son exécution et elle sera alors :
-   
+1. **Pending** - en attente, elle n'a pas finie son exécution
+2. Si elle a fini son exécution et elle sera alors :
+
     a. **Resolved** - succes dans l’execution, résultat disponible
 
-    b. **Rejected** - erreur dans l’execution, le résultat indisponible
+    b. **Rejected** - erreur dans l’execution, le résultat n'est pas disponible
 
 
 <br>
@@ -187,25 +186,130 @@ Pour utiliser une promesse, on doit la **créer** et la **consommer**:
 
 ```js
 const obtenirFilm = new Promise ((resolve, reject) => {
-
-    // lancer un code asynchrone (ex: appel AJAX)
+    // ici il y aura un code qui prendra du temps
+    // et qui renverra un résultat dans le cas de succés
+    // et un autre différent dans le cas d'échec
 
     // si l'exécution est ok on fait appel à resolve
-    resolve (résultat);
-
+    if (...){
+        resolve (resultatResolve);
+    }
     // autrement on fait appel à reject
-    reject(résultat);
-    
+    else {
+        reject(resultatReject);
+    }
 })
+```
+La fonction anonyme dans le constructeur est l'**executor**
+L'appel à resolve renvoie la variable **resultatResolve**
+L'appel à reject renvoie la variable **resultatReject**
+
+**Resolve** et **reject** sont reçues en paramètres. C'est l'appel à la promesse ("consommer la promesse") qui envoie ces fonctions.
+
+```js
+obtenirFilm
+.then ( 
+    (resResolve) => {
+        // faire quoi qui ce soit avec le résultat du success
+        // de l'opération asynchrone    },
+    (resReject) => {
+        // faire quoi qui ce soit avec le résultat du échec 
+        // de l'operation asynchrone
+    }
+);
+```
+
+On lance la consommation de la promesse quand on fait appel à **then**. La méthode **then** reçoit deux callbacks : **resolve** et **reject**. On n'est pas obligé de définir **reject** dans tous les cas.
+
+Si une erreur se produit pendant l'execution de la promesse on peut le capturer avec **catch**. Normalement on peut les capturer avec **reject** mais avec **catch** on peut couvrir le reste de cas. Si une erreur se produit dans le **then**, elle sera capturée par le catch.
+
+obtenirFilm
+.then ( 
+    (resResolve) => {
+        // faire quoi qui ce soit avec le résultat du success
+        // de l'opération asynchrone    },
+    (resReject) => {
+        // faire quoi qui ce soit avec le résultat du échec 
+        // de l'operation asynchrone
+    }
+)
+.catch (
+    (erreur) => {
+        // faire quoi qui ce soit avec l'erreur
+    }
+)
+;
+
+<br>
+
+## 2. API FETCH
+
+<br>
+
+**fetch()** est une méthode JavaScript standard qui permet de récupérer des données à partir d'une URL. Elle renvoie une promesse qui résout avec les données de la réponse de la requête HTTP. Vous pouvez utiliser cette méthode pour envoyer des requêtes HTTP et récupérer des données depuis un serveur, un fichier, ou toute autre source.
+
+Voici quelques exemples d'utilisation de fetch() :
+
+<br>
+
+**1. Récupérer de données** (voir exemples 5 et 6 poour avoir des exemples complet)
+```js
+fetch('https://example.com/data')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.log(error));
+```
+
+**2. Envoyer une requête POST avec des données en utilisant fetch()**
+
+```js
+const data = { name: 'John', age: 30 };
+
+fetch('https://example.com/submit', {
+  method: 'POST',
+  body: JSON.stringify(data),
+  headers: { 'Content-Type': 'application/json' },
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.log(error));
 ```
 
 
-2. **Consommer** (utiliser) une promesse : on lance la promesse et on attend le résultat de l’opération asynchrone pour l’utiliser dans…
-
-        ◦ le callback resolve implémenté dans la section then
-        ◦ le callback reject implémenté dans la section catch 
 
 
-	
-L’executor a deux paramètres callbacks : resolve et reject. Pendant la consommation de la promese (plus bas), le callback resolve sera appelé si l’opération à réaliser (obtenir image, données BD, etc… ) a été complétée avec succès. 
-Autrement, le callback reject sera appelé. Toutes les deux méthodes reçoivent un paramètre qui contient le résultat de l’exécution de l’opération asynchrone. 
+
+<br>
+
+## 3. ASYNC-AWAIT 
+
+
+Une fonction **async** est une fonction JavaScript spéciale qui permet d'écrire des code asynchrone de manière plus simple et plus lisible, et permet l'utilisation d'await.
+
+**await** est utilisé pour attendre la résolution d'une promesse avant de continuer l'exécution du code. Il ne peut être utilisé que dans une fonction dé déclaré avec async.
+
+Une fonction async renvoie toujours une promesse qui résout avec ce qu'on met dans le return (si pas de return, la promesse résout à undefined).
+
+**Notez que quand on fait appel à une function async, le reste du code continue son exécution.**
+Une utilisation de base peut être :
+
+```js
+async function getData() {
+    // l'attente se passe uniquement entre les 
+    // appels asynchrones ici
+    const response = await fetch('https://example.com/data');
+    const data = await response.json();
+    console.log(data);
+    // la promesse résout à undefined
+}
+
+getData();
+console.log ("on continue..."); // ce code se lance sans attendre!
+``` 
+
+Await ne bloque pas l'exécution du code, mais il permet de synchroniser l'exécution du code asynchrone.
+
+Lorsque vous utilisez await pour attendre la fin d'une tâche asynchrone, le code qui suit l'instruction await ne s'exécute pas tant que la tâche asynchrone n'est pas terminée. Cela permet de synchroniser l'exécution du code avec la fin de la tâche asynchrone, mais cela ne bloque pas l'exécution d'autres tâches qui peuvent s'exécuter en parallèle.
+
+En résumé, await ne bloque pas l'exécution du code, mais il permet de synchroniser l'exécution du code asynchrone. Il permet d'attendre la fin d'une tâche asynchrone avant de continuer à exécuter le code suivant, sans bloquer l'exécution d'autres tâches.
+

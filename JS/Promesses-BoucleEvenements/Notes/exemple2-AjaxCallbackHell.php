@@ -21,7 +21,7 @@
 
                 // on cherche maintenant tous les films de ce genre
                 xhr = new XMLHttpRequest();
-                xhr.open("GET", "obtenirTousFilmsGenre.php?idGenre=" + film.idGenre); // appel AJAX .......
+                xhr.open("GET", "./obtenirTousFilmsGenre.php?idGenre=" + film.idGenre); // appel AJAX .......
                 xhr.onreadystatechange = function() {
 
                     if (xhr.readyState === 4 && xhr.status === 200) {
