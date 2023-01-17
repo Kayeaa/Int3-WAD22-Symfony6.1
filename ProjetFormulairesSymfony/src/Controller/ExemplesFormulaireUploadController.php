@@ -72,6 +72,7 @@ class ExemplesFormulaireUploadController extends AbstractController
 
 
             if ($fichier) {
+                // ici on utilise le Service
                 $nomFichierServeur = $uploader->uploadImagePays($fichier);
                 $pays->setImage($nomFichierServeur);
             }

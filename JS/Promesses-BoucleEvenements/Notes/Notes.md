@@ -262,8 +262,36 @@ fetch('https://example.com/data')
 
 **2. Envoyer une requête POST avec des données en utilisant fetch()**
 
+
+**Fetch** renvoie une promesse. Sa résolution nous donne un objet Response.
+On peut enchaîner avec then et faire appel à la fonction response.json, qui renvoie à son tour une promesse. 
+La résolution de cette promesse nous donnera le contenu json de cet objet Response (.json parcourt l'objet et extrait le contenu JSON).
+On peut alors la résoudre et obtenir les données (ici "data") pour faire quoi qui ce soit.
+
+Voici une requête GET :
+
 ```js
-const data = { name: 'John', age: 30 };
+// URL de l'API OpenWeatherMap avec l'ID de la ville et la clé d'API
+const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Paris&appid=YOUR_API_KEY`;
+
+// Utilisation de l'API fetch pour envoyer une requête à l'URL de l'API
+fetch(apiUrl)
+  .then(response => response.json()) // Parsage des données de réponse en JSON
+  .then(data => {
+    // Traitement des données récupérées
+    console.log(data);
+  })
+  .catch(error => {
+    // Gestion des erreurs de réseau
+    console.error(error);
+  });
+```
+
+Voici une requête POST :
+
+
+```js
+const data = { name: 'Marie', age: 35 };
 
 fetch('https://example.com/submit', {
   method: 'POST',
@@ -272,11 +300,28 @@ fetch('https://example.com/submit', {
 })
 .then(response => response.json())
 .then(data => console.log(data))
-.catch(error => console.log(error));
+.catch(error => console.log(error)); // on peut produi
 ```
 
+**fetch** ne gére pas les **reject** des promesses. Tout ce qu'on peut faire est créer un bloc try-catch pour capturer les exceptions. **fetch ne lance pas des exceptions pour les erreurs HTTP**, il les lance uniquement quand il y a une erreur de réseau: https://developer.mozilla.org/en-US/docs/Web/API/fetch#exceptions
 
+On peut quand-même toujours faire le reject à la main dans notre code:
 
+```js
+fetch(url).then((response) => {
+  if (// condition de notre réponse ok) {
+    return response.json();
+  }
+  // on lance une exception ad-hoc
+  throw new Error('Il y a eu un problème X');
+})
+.then((responseJson) => {
+  // Do something with the response
+})
+.catch((error) => {
+  console.log(error) // celle-ci capture uniquement les erreurs de réseau
+});
+```
 
 
 <br>

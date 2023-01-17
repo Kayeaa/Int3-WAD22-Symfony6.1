@@ -16,11 +16,11 @@
             // ici on aura une opération ASYNCHRONE qui consomme du temps.
             // Dans un example réel on aura un appel AJAX
             // L'opération doit être non-bloquante 
-            // (ex: appel XHR, setTimeout etc...)
+            // (ex: appel AJAX, setTimeout etc...)
 
-            // juste pour montrer resolve et reject 
+            // juste pour montrer la syntaxe resolve et reject 
             // on va générer un résultat aléatoire
-            // (random)
+            // (random). Ce résultat doit venir de l'opération asynchrone (qu'on n'a pas lancé dans cet exemple théorique)
             let val = Math.floor(Math.random() * 2);
             if (val == 1) {
                 resolve("tout ok");
@@ -30,8 +30,11 @@
         });
 
 
-        // Syntaxe: 
-        // .then (onResolve, onReject)
+        // Syntaxe de base:
+        // nomPromesse.then (onResolve, onReject)
+        // ou
+        // nomPromesse.then (onResolve)
+
 
         promesse
             .then(
