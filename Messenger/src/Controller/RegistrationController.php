@@ -9,12 +9,10 @@ use App\Form\RegistrationFormType;
 use App\Security\UserAuthenticator;
 use Symfony\Component\Mime\Address;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBus;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\MessengerHandler\EmailInscriptionHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +24,15 @@ class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
 
-    // message bus. Injection dans le constructeur
+    // message bus. Injection dans le constructeur. 
+    // Dans cet exemple on fait appel au handler depuis le controller,
+    // mais on peourrait externaliser l'appel vers un Service
+    // (voir l'exemple d'upload d'image)
+
+    // Ici le traitement est synchrone... on ne voit pas 
+    // vraiment une avantage d'utiliser Messenger
+    // sauf si on considére la séparation de responsabilités
+    // (envoi du mail externalisé vers un handler)
     private $messageBus;
 
     public function __construct(EmailVerifier $emailVerifier, MessageBusInterface $messageBus)

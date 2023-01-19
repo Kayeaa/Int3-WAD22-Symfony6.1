@@ -21,4 +21,7 @@ class UploadHelper
         $fichier->move($this->dossierUpload . "/", $nomFichierServeur);
         return $nomFichierServeur;
     }
+
+    
+
 }

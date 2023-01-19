@@ -1,6 +1,6 @@
 <?php
 
-namespace App\MessengerHandler;
+namespace App\MessageHandler;
 
 use App\Message\EmailInscription;
 use App\Repository\UserRepository;
