@@ -206,6 +206,7 @@ L'appel à reject renvoie la variable **resultatReject**
 
 **Resolve** et **reject** sont reçues en paramètres. C'est l'appel à la promesse ("consommer la promesse") qui envoie ces fonctions.
 
+
 ```js
 obtenirFilm
 .then ( 
@@ -220,6 +221,36 @@ obtenirFilm
 ```
 
 On lance la consommation de la promesse quand on fait appel à **then**. La méthode **then** reçoit deux callbacks : **resolve** et **reject**. On n'est pas obligé de définir **reject** dans tous les cas.
+
+Dans plein de cas on utilisera une syntaxe simplifié, sans **reject**:
+
+```js
+obtenirFilm
+.then ( 
+    (resResolve) => { 
+        // code 
+    }
+);
+```
+
+ou encore plus simplifié si on fait que renvoyer une valeur : 
+
+```js
+obtenirFilm
+.then ( 
+    (resResolve) => valRetour
+);
+```
+
+**Important**: **then** renvoie **toujours** une promesse. Si on fait juste **return** dans le code du then, la valeur de retour sera la valeur de la résolution de la promesse (resolve)
+
+```js
+.then ( val => val)
+.then ( val => console.log (val) );
+```
+
+affichera **val**.
+
 
 Si une erreur se produit pendant l'execution de la promesse on peut le capturer avec **catch**. Normalement on peut les capturer avec **reject** mais avec **catch** on peut couvrir le reste de cas. Si une erreur se produit dans le **then**, elle sera capturée par le catch.
 

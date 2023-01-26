@@ -12,7 +12,7 @@
     <script>
         // la promesse renvoie une valeur dans ce cas
         const promesse = new Promise((resolve, reject) => {
-            
+
             // ici on aura une opération ASYNCHRONE qui consomme du temps.
             // Dans un example réel on aura un appel AJAX
             // L'opération doit être non-bloquante 
@@ -34,8 +34,6 @@
         // nomPromesse.then (onResolve, onReject)
         // ou
         // nomPromesse.then (onResolve)
-
-
         promesse
             .then(
                 (resResolve) => {
@@ -44,7 +42,14 @@
                 (error) => {
                     console.log(error);
                 });
-        console.log ("le code continue");
+        console.log("le code continue");
+
+        // Syntaxe la plus utilisée:
+        // nomPromesse.then (onResolve)
+        promesse
+            .then((resResolve) => {
+                console.log(resResolve)
+            });
     </script>
 
 </body>

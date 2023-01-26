@@ -15,10 +15,12 @@
         fetch("./obtenirFilm.php?id=" + idFilm)
             .then(reponse => reponse.json()) // dans una arrow function: si un seul param, pas besoin de parenthéses. Si une seule instruction return, pas besoin des accolades
             .then((idGenre) => {
-                return fetch("./obtenirTousFilmsGenre.php?idGenre=" + idGenre)
+                return fetch("./obtenirTousFilmsGenre.php?idGenre=" + idGenre);
+                // on fait return et on renvoie une promesse à traiter dans le then suivant
             })
-            .then(reponse => reponse.json()) // dans una arrow function: si un seul param, pas besoin de parenthéses. Si une seule instruction return, pas besoin des accolades
-            .then(res => console.log(res));
+            .then(reponse => reponse.json()) // ce then il renvoie aussi une promesse, créée par .json()
+            // dans una arrow function: si un seul param, pas besoin de parenthéses. Si une seule instruction return, pas besoin des accolades
+            .then(res => console.log(res)); // ce then renvoie une promesse dans le resolve n'a pas de valeur (undefined)
     </script>
 </body>
 

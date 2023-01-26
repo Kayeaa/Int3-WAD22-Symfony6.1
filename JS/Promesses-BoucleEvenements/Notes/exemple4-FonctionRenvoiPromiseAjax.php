@@ -85,6 +85,10 @@
             .then((idGenre) => {
                 return appelAjax("./obtenirTousFilmsGenre.php?idGenre=" + idGenre);
                 // cette nouvel appel renvoie une promesse aussi, je peux enchainer avec then
+                // attention à éviter le callback hell: on pourrait être temptés de faire:
+                // appelAjax("./obtenirTousFilmsGenre.php?idGenre=" + idGenre)
+                // .then ..... 
+                // mais on entre vite dans le callback hell
             })
             .then((res) => {
                 console.log(res);
