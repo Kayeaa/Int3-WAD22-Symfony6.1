@@ -1,3 +1,16 @@
+# Documentation de base sur les promesses
+
+- [Documentation de base sur les promesses](#documentation-de-base-sur-les-promesses)
+- [1. Boucle d'événements, exemples de base](#1-boucle-dévénements-exemples-de-base)
+- [2. Callback Hell](#2-callback-hell)
+- [3. Les Promesses : la solution](#3-les-promesses--la-solution)
+  - [3.1. Création, production et consommation d’une promesse](#31-création-production-et-consommation-dune-promesse)
+  - [3.2. API FETCH](#32-api-fetch)
+  - [3.3. ASYNC-AWAIT](#33-async-await)
+
+
+<br>
+
 # 1. Boucle d'événements, exemples de base
 
 <br>
