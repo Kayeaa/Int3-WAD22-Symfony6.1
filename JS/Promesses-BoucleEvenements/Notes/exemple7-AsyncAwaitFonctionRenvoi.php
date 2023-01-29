@@ -14,22 +14,29 @@
 
         // on simplifie la fonction qui renvoie la promesse
         // avec async-await car on n'enchaîne pas avec then.
-        // ici on a un appel à une fonctio asynchrone (le code continue après appelAjax)
+        
+        // ici on a un appel à une fonction asynchrone (le code continue après appelAjax)
         // mais à son intérieur le code est synchrone à cause des await.
         // C'est un possible objectif: avoir une suite d'opérations asynchrones enchainées d'une manière synchrone 
         async function appelsAjax() {
+            
             let response = await fetch("./obtenirFilm.php?id=" + idFilm);
+            // on attend ici...
             let idGenre = await response.json();
+            // on attend ici...
             response = await fetch("./obtenirTousFilmsGenre.php?idGenre=" + idGenre);
+            // on attend ici...
             let films = await response.json();
-            console.log ( films);
+            // on attend ici...
+            return films;
+
         };
 
-        appelsAjax();
-        console.log ("je continue... sans attendre");
-
-
-        
+        appelsAjax().then((films) => {
+            console.log(`Voici les films:`);
+            console.log (films);
+        });
+        console.log("je continue... sans attendre");
     </script>
 </body>
 

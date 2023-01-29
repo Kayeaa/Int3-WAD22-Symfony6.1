@@ -23,17 +23,25 @@
                 console.log(res);
                 // return (res);
             }) // info complementaire: tout THEN renvoie une promesse. 
-            // Si on renvoie une valeur simple (comme "res" ci-dessous entre commentaires) 
-            // then génére une promesse dont le resolve es la valeur du return.
-            // On verrait "Object" dans le code suivant si on enleve tous les commentaires. 
-            // Si on laisse le return commenté, la promesse resoudra en "undefined".
-            // .then((res) => console.log(typeof(res)));
+        // Si on renvoie une valeur simple (comme "res" ci-dessous entre commentaires) 
+        // then génére une promesse dont le resolve es la valeur du return.
+        // On verrait "Object" dans le code suivant si on enleve tous les commentaires. 
+        // Si on laisse le return commenté, la promesse resoudra en "undefined".
+        // .then((res) => console.log(typeof(res)));
 
         // le code simplifié (et le plus utilisé :D) serait:
         fetch("./obtenirFilm.php?id=" + idFilm)
-            .then(reponse => reponse.json()) // dans una arrow function: si un seul param, pas besoin de parenthéses. Si une seule instruction return, pas besoin des accolades
+            .then(reponse => reponse.json(),
+                err => { // ce callback onRejected est lancé s'il y a une erreur de reseau
+                    // Testez en mettant http://casdcasdfasdfaf.com dans l'URL.
+
+                    console.log(`Il y a eu une érreur de réseau`);
+                    throw new Error(err); // on 'l'envoie' au catch, qui va le traiter
+                }) // dans una arrow function: si un seul param, pas besoin de parenthéses. Si une seule instruction return, pas besoin des accolades
             .then(res => console.log(res) // on est en train de faire un "return console.log (res)", mais ce n'est pas un problème
-            );
+            )
+            // .then (res => console.log (res)) // ceci donnerai un "undefined". La valeur de résolution de la dernière promesse n'est pas "res" mais "console.log (res)"
+            .catch(error => console.log(`Voici l'erreur: ${error}`));
 
 
         // à l'intérieur du code on aura quelque chose comme ci-dessous:
@@ -45,6 +53,7 @@
         //         }
         //         .
         //         .
+        //          return promesse;
         //      }
 
         //     const json = (...) { // json est une méthode de l'objet Response

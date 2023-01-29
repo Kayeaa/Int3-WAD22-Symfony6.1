@@ -1,4 +1,4 @@
-# Boucle d'événements, exemples de base
+# 1. Boucle d'événements, exemples de base
 
 <br>
 Pour comprendre les promesses on doit d'abord avoir certains notions sur la boucle d'événements de JS.
@@ -72,7 +72,7 @@ Quand le moment d'être lancé est arrivé pour la tâche asynchrone (setTimeout
 
 <br>
 
-## Callback Hell
+# 2. Callback Hell
 
 <br>
 
@@ -150,7 +150,7 @@ getData("https://example.com/page1.php", function(data1) {
 
 <br>
 
-# Les Promesses : la solution
+# 3. Les Promesses : la solution
 
 <br>
 
@@ -176,7 +176,7 @@ Une promese peut se trouver dans les états suivants :
 <br>
 
 
-## 1. Création, production et consommation d’une promesse
+## 3.1. Création, production et consommation d’une promesse
 
 <br>
 
@@ -216,7 +216,8 @@ obtenirFilm
         // faire quoi qui ce soit avec le résultat du success
         // de l'opération asynchrone    
         },
-    // méthode onRejected
+    // méthode onRejected FACULTATIF. 
+    // Si pas défini, reject génére une exception
     (resReject) => {
         // faire quoi qui ce soit avec le résultat du échec 
         // de l'operation asynchrone
@@ -224,7 +225,7 @@ obtenirFilm
 );
 ```
 
-On lance la consommation de la promesse quand on fait appel à **then**. La méthode **then** reçoit deux callbacks : **onResolve** et **onRejected**. On n'est pas obligé de définir **onRejected** dans tous les cas.
+On lance la consommation de la promesse quand on fait appel à **then**. La méthode **then** reçoit un callback **onResolve** (quoi faire si la promesse est accomplie correctement). On peut aussi envoyer une autre méthode  **onRejected** (quoi faire si la promesse échoue). 
 
 Voici un exemple qui montre les deux possibilités:
 
@@ -274,7 +275,51 @@ promesse
 
 ```
 
-Si on ne défini pas **onRejected** et la promesse est rejected, **une exception sera lancée**. Cette exception peut être traitée avec **catch**. D'ailleurs c'est la façon habituelle de gérer cette situation... dans plein de cas vous allez voir que le callback **onRejected** ne sera pas défini mais il y aura un **catch**. Voici le même exemple adapté (pas de **onRejected** mais définition d'un **catch**):
+Si on ne défini pas **onRejected** et la promesse est **rejected** (appel à **reject** dans le code), **une exception sera affichée**. On peut toujours traiter cette exception en utilisant la méthode **catch**. 
+
+On va voir un exemple mais d'abord on doit faire une **précision** sur le fonctionnement de la méthode **then**.
+1. **then** **renvoie** **toujours une promesse**
+2. cette promesse aura, comme valeur du resolve, ce qu'on met dans le **return**.   
+3. dans l'absence de **return**, js renverra **undefined**
+
+Voici un exemple:
+```js
+// la promesse renvoie une valeur dans ce cas
+const promesse = new Promise((resolve, reject) => {
+    resolve("j'aime trop les frites");
+});
+// Syntaxe la plus utilisée:
+// nomPromesse.then (onResolve)
+console.log("chaîne de thens");
+promesse
+    .then((resResolve) => {
+        return resResolve;
+    })
+    // ce then renvoie une promesse dans la valeur pour
+    // le resolve est le contenu du return 
+    .then((res2) => {
+        console.log("then nr.2");
+        return res2 + " et la bière";
+    })
+    .then((res3) => { // renvoie une promesse
+        console.log("then nr.3");
+        return res3 + " et le chocolat";
+    })
+    .then((res4) => { // ne renvoie rien: js crée une promesse 
+        // dont la valeur de résolution est undefined
+        console.log("then nr.4");
+        console.log(res4);
+    })
+    .then((res5) => { // renvoie
+        console.log("then nr.5");
+        console.log("Mais enfin! il manque un return... j'en ai rien ici!");
+        console.log(res5);
+    })
+```
+
+
+Continuons alors avec nos exemple de **reject** , cette fois avec un **catch** :
+
 
 ```js
 // la promesse renvoie une valeur dans ce cas
@@ -297,18 +342,16 @@ const promesse = new Promise((resolve, reject) => {
 });
 
 
-
-
 // Syntaxe la plus utilisée:
 // nomPromesse.then (onResolve)
 console.log("appel");
 promesse
     .then((resResolve) => {
         return (resResolve);
-    }) // on va enchaîner
-    .then((resResolve) => {
+    }) // on va enchaîner les then, juste pour tester
+    .then((res) => { 
         console.log ("On enchaine: ");
-        console.log(resResolve);
+        console.log(res);
     })
     .catch((erreur) => {
         console.log(`Erreur traité avec catch : ${erreur}`);
@@ -316,10 +359,10 @@ promesse
 
 // on aura une exception en cas de reject,
 // on la capture avec le catch.
-
 console.log("le code continue");
 ```
 
+Dans beaucoup de cas vous allez voir que le callback **onRejected** ne sera pas défini mais il y aura un **catch**. C'est le cas, par exemple, de l'API **fetch** car elle génére une exception **seulement en cas d'érreur de réseau** (on verra un exemple plus tard). 
 
 Si on avait enchaîné d'autres **.then**, le **catch** capturerait le reject de n'importe quelle promesse précedante. Ou même d'une erreur de programmation à l'intérieur des "then". Essayez vous-même: faites une erreur de syntaxe dans le deuxième **then**.
 
@@ -352,30 +395,11 @@ obtenirDesDonneesDeApi()
 
 
 ```
-Dans certains cas on utilisera une syntaxe simplifié, sans **reject**:
-
-```js
-obtenirFilm
-.then ( 
-    (resResolve) => { 
-        // code 
-    }
-);
-```
-
-ou encore plus simplifié si on fait que renvoyer une valeur : 
-
-```js
-obtenirFilm
-.then ( 
-    (resResolve) => valRetour
-);
-```
 
 <br>
 
 
-En résumé, **reject** est utilisé pour signaler qu'une promesse ne peut pas être remplie, et **onRejected** et **catch** sont utilisés pour gérer ces promesses rejetées et prendre les mesures appropriées. 
+En résumé, **reject** est utilisé pour signaler qu'une promesse ne peut pas être remplie, et **onRejected** et **catch** sont utilisés pour gérer ces promesses rejetées et prendre les mesures appropriées. C'est à nous de définir un **onRejected** ou de tout traiter avec **catch**.
 
 
 
@@ -385,13 +409,15 @@ En résumé, **reject** est utilisé pour signaler qu'une promesse ne peut pas �
 
 <br>
 
-**fetch()** est une méthode JavaScript standard qui permet de récupérer des données à partir d'une URL. Elle renvoie une promesse qui résout avec les données de la réponse de la requête HTTP. Vous pouvez utiliser cette méthode pour envoyer des requêtes HTTP et récupérer des données depuis un serveur, un fichier, ou toute autre source.
+**fetch()** est une méthode JavaScript standard qui permet de récupérer des données à partir d'une URL. Elle **renvoie une promesse qui résout avec les données de la réponse de la requête HTTP** (dans son code il y aura alors un 'resolve (...)'. 
+Vous pouvez utiliser cette méthode pour envoyer des requêtes HTTP et récupérer des données depuis un serveur, un fichier, ou toute autre source.
 
-Voici quelques exemples d'utilisation de fetch() :
+Voici quelques exemples d'utilisation de **fetch()** :
 
 <br>
 
-**1. Récupérer de données** (voir exemples 5 et 6 poour avoir des exemples complet)
+**1. Récupérer de données** 
+
 ```js
 fetch('https://example.com/data')
   .then(response => response.json())
@@ -399,50 +425,32 @@ fetch('https://example.com/data')
   .catch(error => console.log(error));
 ```
 
-**2. Envoyer une requête POST avec des données en utilisant fetch()**
 
+**Fetch** renvoie une promesse qu'on peut consommer. La résolution de cette promesse nous donne un objet Response.
+On peut enchaîner avec then et faire appel à la fonction response.json, qui renvoie à son tour une promesse qu'on pourra consommer et dont le resolve nous donne du JSON.
 
-**Fetch** renvoie une promesse. Sa résolution nous donne un objet Response.
-On peut enchaîner avec then et faire appel à la fonction response.json, qui renvoie à son tour une promesse. 
 La résolution de cette promesse nous donnera le contenu json de cet objet Response (.json parcourt l'objet et extrait le contenu JSON).
+
 On peut alors la résoudre et obtenir les données (ici "data") pour faire quoi qui ce soit.
 
 Voici une requête GET :
 
 ```js
-// URL de l'API OpenWeatherMap avec l'ID de la ville et la clé d'API
-const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Paris&appid=YOUR_API_KEY`;
-
-// Utilisation de l'API fetch pour envoyer une requête à l'URL de l'API
-fetch(apiUrl)
-  .then(response => response.json()) // Parsage des données de réponse en JSON
-  .then(data => {
-    // Traitement des données récupérées
-    console.log(data);
-  })
-  .catch(error => {
-    // Gestion des erreurs de réseau
-    console.error(error);
-  });
+// le code simplifié (et le plus utilisé :D) serait:
+fetch("./obtenirFilm.php?id=" + idFilm)
+    .then(reponse => reponse.json(),
+        err => { // ce callback onRejected est lancé s'il y a une erreur de reseau
+                // Testez en mettant http://casdcasdfasdfaf.com dans l'URL.
+                
+            console.log(`Il y a eu une érreur de réseau`);
+            throw new Error(err); // on 'l'envoie' au catch, qui va le traiter
+        }) // dans una arrow function: si un seul param, pas besoin de parenthéses. Si une seule instruction return, pas besoin des accolades
+    .then(res => console.log(res) // on est en train de faire un return "console.log (res)", mais ce n'est pas un problème
+    )
+    .catch(error => console.log(`Voici l'erreur: ${error}`));
 ```
 
-Voici une requête POST :
-
-
-```js
-const data = { name: 'Marie', age: 35 };
-
-fetch('https://example.com/submit', {
-  method: 'POST',
-  body: JSON.stringify(data),
-  headers: { 'Content-Type': 'application/json' },
-})
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => console.log(error)); // on peut produi
-```
-
-**fetch** ne gére pas les **reject** des promesses. Tout ce qu'on peut faire est créer un bloc try-catch pour capturer les exceptions. **fetch ne lance pas des exceptions pour les erreurs HTTP**, il les lance uniquement quand il y a une erreur de réseau: https://developer.mozilla.org/en-US/docs/Web/API/fetch#exceptions
+**fetch** ne gére pas les **reject** des promesses sauf s'il y a une érreur de réseau. Tout ce qu'on peut faire est créer un bloc try-catch pour capturer les exceptions. **fetch ne lance pas des exceptions pour les erreurs HTTP**, il les lance uniquement quand il y a une erreur de réseau: https://developer.mozilla.org/en-US/docs/Web/API/fetch#exceptions
 
 On peut quand-même toujours faire le reject à la main dans notre code:
 
@@ -468,11 +476,11 @@ fetch(url).then((response) => {
 ## 3. ASYNC-AWAIT 
 
 
-Une fonction **async** est une fonction JavaScript spéciale qui permet d'écrire des code asynchrone de manière plus simple et plus lisible, et permet l'utilisation d'await.
+Une fonction **async** est une fonction JavaScript spéciale qui permet d'écrire des code asynchrone de manière plus simple et plus lisible, et permet l'utilisation d'**await**.
 
-**await** est utilisé pour attendre la résolution d'une promesse avant de continuer l'exécution du code. Il ne peut être utilisé que dans une fonction dé déclaré avec async.
+**await** est **utilisé à l'intérieru de la fonction asynchrone pour attendre la résolution d'une promesse avant de continuer l'exécution du code**. Il ne peut être utilisé que dans une fonction dé déclaré avec async (sauf dans certains cas particulières)
 
-Une fonction async renvoie toujours une promesse qui résout avec ce qu'on met dans le return (si pas de return, la promesse résout à undefined).
+Une **fonction async renvoie toujours une promesse** qui résout avec ce qu'on met dans le return (si pas de return, la promesse résout à undefined).
 
 **Notez que quand on fait appel à une function async, le reste du code continue son exécution.**
 Une utilisation de base peut être :
@@ -484,16 +492,50 @@ async function getData() {
     const response = await fetch('https://example.com/data');
     const data = await response.json();
     console.log(data);
-    // la promesse résout à undefined
+    // la promesse résout à undefined. On peut mettre un return ici
+    // et la consommer avec then.
 }
 
 getData();
 console.log ("on continue..."); // ce code se lance sans attendre!
 ``` 
 
-Await ne bloque pas l'exécution du code, mais il permet de synchroniser l'exécution du code asynchrone.
+Voici un exemple plus élaboré:
+```js
+let idFilm = 1; // on le fixe, ça peut venir de n'importe où
 
-Lorsque vous utilisez await pour attendre la fin d'une tâche asynchrone, le code qui suit l'instruction await ne s'exécute pas tant que la tâche asynchrone n'est pas terminée. Cela permet de synchroniser l'exécution du code avec la fin de la tâche asynchrone, mais cela ne bloque pas l'exécution d'autres tâches qui peuvent s'exécuter en parallèle.
+// on simplifie la fonction qui renvoie la promesse
+// avec async-await car on n'enchaîne pas avec then.
 
-En résumé, await ne bloque pas l'exécution du code, mais il permet de synchroniser l'exécution du code asynchrone. Il permet d'attendre la fin d'une tâche asynchrone avant de continuer à exécuter le code suivant, sans bloquer l'exécution d'autres tâches.
+// ici on a un appel à une fonction asynchrone (le code continue après appelAjax)
+// mais à son intérieur le code est synchrone à cause des await
+
+// C'est un possible objectif: avoir une suite d'opérations asynchrones enchainées d'une manière synchrone 
+async function appelsAjax() {
+    
+    let response = await fetch("./obtenirFilm.php?id=" + idFilm);
+    // on attend ici...
+    let idGenre = await response.json();
+    // on attend ici...
+    response = await fetch("./obtenirTousFilmsGenre.php?idGenre=" + idGenre);
+    // on attend ici...
+    let films = await response.json();
+    // on attend ici...
+    return films;
+
+};
+
+appelsAjax().then((films) => {
+    console.log(`Voici les films:`);
+    console.log (films);
+});
+console.log("je continue... sans attendre");
+```
+
+
+**Await** ne bloque pas l'exécution du code, mais il permet de synchroniser l'exécution du code asynchrone (établir un ordre séquentiel).
+
+Lorsque vous utilisez **await** **pour attendre la fin d'une tâche asynchrone**, **le code qui suit l'instruction await ne s'exécute pas tant que la tâche asynchrone n'est pas terminée**. Cela permet de synchroniser l'exécution du code avec la fin de la tâche asynchrone, mais cela ne bloque pas l'exécution d'autres tâches qui peuvent s'exécuter en parallèle (**car le code qui se trouve après l'appel à la fonction asyncrone se exécute immediatement**).
+
+En résumé, **await** ne bloque pas l'exécution du code, mais il permet de synchroniser l'exécution du code asynchrone. Il permet d'attendre la fin d'une tâche asynchrone avant de continuer à exécuter le code suivant, sans bloquer l'exécution d'autres tâches.
 

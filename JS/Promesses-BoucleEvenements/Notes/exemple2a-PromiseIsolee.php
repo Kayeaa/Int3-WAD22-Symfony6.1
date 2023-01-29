@@ -29,12 +29,20 @@
             }
         });
 
+        // Syntaxe la plus utilisée:
+        // nomPromesse.then (onResolve)
+        console.log("appel 2");
+        promesse
+            .then((resResolve) => {
+                console.log(resResolve)
+            }); // on aura une exception en cas de reject
 
-        // Syntaxe de base:
+        // Syntaxe complete:
         // nomPromesse.then (onResolve, onReject)
         // ou
         // nomPromesse.then (onResolve)
         console.log("appel 1");
+        
         promesse
             .then(
                 (resResolve) => {
@@ -43,15 +51,9 @@
                 (error) => {
                     console.log(error);
                 });
+
         console.log("le code continue");
 
-        // Syntaxe la plus utilisée:
-        // nomPromesse.then (onResolve)
-        console.log("appel 2");
-        promesse
-            .then((resResolve) => {
-                console.log(resResolve)
-            }); // on aura une exception en cas de reject
     </script>
 
 </body>
