@@ -405,7 +405,7 @@ En résumé, **reject** est utilisé pour signaler qu'une promesse ne peut pas �
 
 <br>
 
-## 2. API FETCH
+## 3.2. API FETCH
 
 <br>
 
@@ -473,8 +473,9 @@ fetch(url).then((response) => {
 
 <br>
 
-## 3. ASYNC-AWAIT 
+## 3.3. ASYNC-AWAIT 
 
+<br>
 
 Une fonction **async** est une fonction JavaScript spéciale qui permet d'écrire des code asynchrone de manière plus simple et plus lisible, et permet l'utilisation d'**await**.
 
