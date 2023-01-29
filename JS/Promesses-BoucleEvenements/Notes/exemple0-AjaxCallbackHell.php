@@ -18,7 +18,6 @@
                 // résultat du premier appel AJAX ...
                 let film = JSON.parse(xhr.responseText);
                 // console.log(film);
-
                 // on cherche maintenant tous les films de ce genre
                 xhr = new XMLHttpRequest();
                 xhr.open("GET", "./obtenirTousFilmsGenre.php?idGenre=" + film.idGenre); // appel AJAX .......
@@ -28,7 +27,7 @@
 
                         // résultat du deuxième appel
                         let filmsGenre = JSON.parse(xhr.responseText);
-                        console.log (filmsGenre);
+                        console.log(filmsGenre);
                         // si on veut utiliser ces données pour faire un autre appel
                         // on commence à créer une structure pyramidale dont on ne
                         // connait pas la fin: le callback hell

@@ -25,31 +25,32 @@
             if (val == 1) {
                 resolve("tout ok");
             } else {
-                reject("oh non!");
+                reject("oh non!"); // produira une exception si on n'a pas défini un callback pour resolve ni un catch
             }
         });
 
 
-        // Syntaxe de base:
-        // nomPromesse.then (onResolve, onReject)
-        // ou
-        // nomPromesse.then (onResolve)
-        promesse
-            .then(
-                (resResolve) => {
-                    console.log(resResolve);
-                },
-                (error) => {
-                    console.log(error);
-                });
-        console.log("le code continue");
+
 
         // Syntaxe la plus utilisée:
         // nomPromesse.then (onResolve)
+        console.log("appel");
         promesse
             .then((resResolve) => {
-                console.log(resResolve)
-            });
+                return (resResolve);
+            }) // on va enchaîner
+            .then((resResolve) => {
+                console.log ("On enchaine: ");
+                console.log(resResolve);
+            })
+            .catch((erreur) => {
+                console.log(`Erreur traité avec catch : ${erreur}`);
+            })
+
+        // on aura une exception en cas de reject,
+        // on la capture avec le catch.
+
+        console.log("le code continue");
     </script>
 
 </body>

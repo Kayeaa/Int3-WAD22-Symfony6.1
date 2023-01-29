@@ -37,3 +37,14 @@ Suivez cette doc:
 https://symfony.com/doc/current/http_client.html#basic-usage
 
 https://symfony.com/doc/current/http_client.html
+
+## Promesses isolées
+
+Créez un jeu où la personne doit deviner un chiffre entre 1 et 10 dans un delai de 10 sec.
+Le chiffre est générée automatiquement et la personne la tape dans un input.
+Affichez le résultat après 10 secondes.
+Utilisez setTimeout (vous pouvez rajouter aussi setInterval pour montrer un compte à rebours, mais faites d'abord une version simple).
+
+Une fois que vous avez réalisé l'exercice, **faites une version avec de promesses**:
+Créez une fonction qui renvoie une promesse qui sera resolue une fois que le timeout aura expire.
+Si vous êtes perdu, utilisez le code de l'exemple4 comme guide (fonction qui renvoie une promesse).

@@ -70,6 +70,7 @@ console.log("Fin du script");
 En gros on a deux taches longues, une asynchrone qui ne bloque pas le code (setTimeout) et une synchrone (la boucle) qui carrement bloque le code.
 Quand le moment d'être lancé est arrivé pour la tâche asynchrone (setTimeout) elle doit **quand-même attendre** que la pile d'exécution soit vide.
 
+<br>
 
 ## Callback Hell
 
@@ -169,7 +170,7 @@ Une promese peut se trouver dans les états suivants :
 
     a. **Resolved** - succes dans l’execution, résultat disponible
 
-    b. **Rejected** - erreur dans l’execution, le résultat n'est pas disponible
+    b. **Rejected** - erreur dans l’execution, le résultat n'est pas disponible 
 
 
 <br>
@@ -202,17 +203,20 @@ const obtenirFilm = new Promise ((resolve, reject) => {
 ```
 La fonction anonyme dans le constructeur est l'**executor**
 L'appel à resolve renvoie la variable **resultatResolve**
-L'appel à reject renvoie la variable **resultatReject**
+L'appel à reject renvoie la variable **resultatReject**.
 
 **Resolve** et **reject** sont reçues en paramètres. C'est l'appel à la promesse ("consommer la promesse") qui envoie ces fonctions.
 
 
 ```js
 obtenirFilm
-.then ( 
+.then (
+    // méthode onResolve 
     (resResolve) => {
         // faire quoi qui ce soit avec le résultat du success
-        // de l'opération asynchrone    },
+        // de l'opération asynchrone    
+        },
+    // méthode onRejected
     (resReject) => {
         // faire quoi qui ce soit avec le résultat du échec 
         // de l'operation asynchrone
@@ -220,9 +224,135 @@ obtenirFilm
 );
 ```
 
-On lance la consommation de la promesse quand on fait appel à **then**. La méthode **then** reçoit deux callbacks : **resolve** et **reject**. On n'est pas obligé de définir **reject** dans tous les cas.
+On lance la consommation de la promesse quand on fait appel à **then**. La méthode **then** reçoit deux callbacks : **onResolve** et **onRejected**. On n'est pas obligé de définir **onRejected** dans tous les cas.
 
-Dans plein de cas on utilisera une syntaxe simplifié, sans **reject**:
+Voici un exemple qui montre les deux possibilités:
+
+```js
+// la promesse renvoie une valeur dans ce cas
+const promesse = new Promise((resolve, reject) => {
+
+    // ici on aura une opération ASYNCHRONE qui consomme du temps.
+    // Dans un example réel on aura un appel AJAX
+    // L'opération doit être non-bloquante 
+    // (ex: appel AJAX, setTimeout etc...)
+
+    // juste pour montrer la syntaxe resolve et reject 
+    // on va générer un résultat aléatoire
+    // (random). Ce résultat doit venir de l'opération asynchrone (qu'on n'a pas lancé dans cet exemple théorique)
+    let val = Math.floor(Math.random() * 2);
+    if (val == 1) {
+        resolve("tout ok");
+    } else {
+        reject("oh non!"); // produira une exception si on n'a pas défini un callback pour resolve ni un catch
+    }
+});
+
+
+// Syntaxe de base:
+// nomPromesse.then (onResolved, onRejected)
+// ou
+// nomPromesse.then (onResolved)
+console.log("appel 1");
+promesse
+    .then(
+        (resResolve) => {
+            console.log(resResolve);
+        },
+        (error) => {
+            console.log(error);
+        });
+console.log("le code continue");
+
+// Syntaxe la plus utilisée:
+// nomPromesse.then (onResolve)
+console.log("appel 2");
+promesse
+    .then((resResolve) => {
+        console.log(resResolve)
+    }); // on aura une exception en cas de reject
+
+```
+
+Si on ne défini pas **onRejected** et la promesse est rejected, **une exception sera lancée**. Cette exception peut être traitée avec **catch**. D'ailleurs c'est la façon habituelle de gérer cette situation... dans plein de cas vous allez voir que le callback **onRejected** ne sera pas défini mais il y aura un **catch**. Voici le même exemple adapté (pas de **onRejected** mais définition d'un **catch**):
+
+```js
+// la promesse renvoie une valeur dans ce cas
+const promesse = new Promise((resolve, reject) => {
+
+    // ici on aura une opération ASYNCHRONE qui consomme du temps.
+    // Dans un example réel on aura un appel AJAX
+    // L'opération doit être non-bloquante 
+    // (ex: appel AJAX, setTimeout etc...)
+
+    // juste pour montrer la syntaxe resolve et reject 
+    // on va générer un résultat aléatoire
+    // (random). Ce résultat doit venir de l'opération asynchrone (qu'on n'a pas lancé dans cet exemple théorique)
+    let val = Math.floor(Math.random() * 2);
+    if (val == 1) {
+        resolve("tout ok");
+    } else {
+        reject("oh non!"); // produira une exception si on n'a pas défini un callback pour resolve ni un catch
+    }
+});
+
+
+
+
+// Syntaxe la plus utilisée:
+// nomPromesse.then (onResolve)
+console.log("appel");
+promesse
+    .then((resResolve) => {
+        return (resResolve);
+    }) // on va enchaîner
+    .then((resResolve) => {
+        console.log ("On enchaine: ");
+        console.log(resResolve);
+    })
+    .catch((erreur) => {
+        console.log(`Erreur traité avec catch : ${erreur}`);
+    })
+
+// on aura une exception en cas de reject,
+// on la capture avec le catch.
+
+console.log("le code continue");
+```
+
+
+Si on avait enchaîné d'autres **.then**, le **catch** capturerait le reject de n'importe quelle promesse précedante. Ou même d'une erreur de programmation à l'intérieur des "then". Essayez vous-même: faites une erreur de syntaxe dans le deuxième **then**.
+
+Voici un autre exemple. Celui ici réfuse la promesse et capture l'exception avec le **catch**:
+
+```js
+const obtenirDesDonneesDeApi = () => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://api.example.com/data");
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        resolve(xhr.responseText); 
+      } else {
+        reject(`La requête a échoué avec le code de statut ${xhr.status}`); // érreur (404, 500, etc...)
+      }
+    };
+    xhr.onerror = () => reject("La requête a échoué en raison d'une erreur de réseau");
+    xhr.send();
+  });
+};
+
+obtenirDesDonneesDeApi()
+  .then((data) => {
+    console.log(`Données reçues : ${data}`);
+  })
+  .catch((error) => {
+    console.error(`Erreur : ${error}`);
+  });
+
+
+```
+Dans certains cas on utilisera une syntaxe simplifié, sans **reject**:
 
 ```js
 obtenirFilm
@@ -242,34 +372,12 @@ obtenirFilm
 );
 ```
 
-**Important**: **then** renvoie **toujours** une promesse. Si on fait juste **return** dans le code du then, la valeur de retour sera la valeur de la résolution de la promesse (resolve)
-
-```js
-.then ( val => val)
-.then ( val => console.log (val) );
-```
-
-affichera **val**.
+<br>
 
 
-Si une erreur se produit pendant l'execution de la promesse on peut le capturer avec **catch**. Normalement on peut les capturer avec **reject** mais avec **catch** on peut couvrir le reste de cas. Si une erreur se produit dans le **then**, elle sera capturée par le catch.
+En résumé, **reject** est utilisé pour signaler qu'une promesse ne peut pas être remplie, et **onRejected** et **catch** sont utilisés pour gérer ces promesses rejetées et prendre les mesures appropriées. 
 
-obtenirFilm
-.then ( 
-    (resResolve) => {
-        // faire quoi qui ce soit avec le résultat du success
-        // de l'opération asynchrone    },
-    (resReject) => {
-        // faire quoi qui ce soit avec le résultat du échec 
-        // de l'operation asynchrone
-    }
-)
-.catch (
-    (erreur) => {
-        // faire quoi qui ce soit avec l'erreur
-    }
-)
-;
+
 
 <br>
 
