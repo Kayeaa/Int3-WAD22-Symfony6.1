@@ -72,8 +72,8 @@
                     // le catch est lancé si on fait appel à reject 
                     // et on n'a pas défini une fonction onReject 
                     // dans le then (ce cas!), ou si une autre erreur s'est produite
-                    console.log ("erreur capturé par catch");
-                    console.log (erreur);
+                    console.log("erreur capturé par catch");
+                    console.log(erreur);
                 }
             );
 
@@ -82,8 +82,8 @@
         // obtenir tous le films du même genre que le film choisi.
         // Au revoir Callback Hell!
         appelAjax("./obtenirFilm.php?id=" + idFilm)
-            .then((idGenre) => {
-                return appelAjax("./obtenirTousFilmsGenre.php?idGenre=" + idGenre);
+            .then((film) => {
+                return appelAjax("./obtenirTousFilmsGenre.php?idGenre=" + film.idGenre);
                 // cette nouvel appel renvoie une promesse aussi, je peux enchainer avec then
                 // attention à éviter le callback hell: on pourrait être temptés de faire:
                 // appelAjax("./obtenirTousFilmsGenre.php?idGenre=" + idGenre)

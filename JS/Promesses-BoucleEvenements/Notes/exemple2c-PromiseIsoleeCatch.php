@@ -37,17 +37,23 @@
         console.log("appel");
         promesse
             .then((resResolve) => {
-                return (resResolve);
-            }) // on va enchaîner
+                    return (resResolve);
+                }
+                // ,
+                // (resReject) => {
+                //     return ("erreur mais pas d'exception: " + resReject);
+                // }
+            )
             .then((resResolve) => {
-                console.log ("On enchaine: ");
+                console.log("On enchaine: ");
                 console.log(resResolve);
+                // if (...) throw new SyntaxError("erreur de syntaxe");
             })
             .catch((erreur) => {
                 console.log(`Erreur traité avec catch : ${erreur}`);
             })
 
-        // on aura une exception en cas de reject,
+            // on aura une exception en cas de reject,
         // on la capture avec le catch.
 
         console.log("le code continue");
