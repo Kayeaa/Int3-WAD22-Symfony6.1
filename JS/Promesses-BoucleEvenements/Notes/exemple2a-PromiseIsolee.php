@@ -31,7 +31,7 @@
 
         // Syntaxe la plus utilisée:
         // nomPromesse.then (onResolve)
-        console.log("appel 2");
+        console.log("appel 1");
         promesse
             .then((resResolve) => {
                 console.log(resResolve)
@@ -41,7 +41,7 @@
         // nomPromesse.then (onResolve, onReject)
         // ou
         // nomPromesse.then (onResolve)
-        console.log("appel 1");
+        console.log("appel2");
         
         promesse
             .then(
