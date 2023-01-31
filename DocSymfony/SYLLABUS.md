@@ -232,7 +232,7 @@ Puis, installex ces extensions :
 L'installation de Symfony est juste l'installation d'un fichier executable. 
 Dans Windows, le fichier porte le nom **symfony.exe** et peut être teléchargé de plusieurs manières.
 
-Ceci est un lien direct : https://github.com/symfony-cli/symfony-cli/releases/download/v5.0.9/symfony-cli_windows_amd64.zip
+Ceci est un lien direct : https://github.com/symfony-cli/symfony-cli/releases/download/v5.4.21/symfony-cli_windows_amd64.zip
 
 Decompressez le fichier dans un dossier de votre choix. 
 Vu qu'on doit faire appel à ce fichier depuis la console, le plus simple est de le copier dans xampp/php (qui se trouve déjà dans le path).
