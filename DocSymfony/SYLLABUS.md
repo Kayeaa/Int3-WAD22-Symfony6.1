@@ -1144,7 +1144,7 @@ On va étudier cette méthode dans la section qui suit.
 En Symfony nous pourrions générer les vues en utilisant du HTML et PHP pur, mais l'utilisation de TWIG comme **moteur de templates** nous facilitera beaucoup la tâche. **Un moteur de templates sert à générer les vues (HTML + JS) à partir d'un fichier de base (template).** On part du principe que tout ce qui concerne la présentation (les vues) se trouvera
 dans les templates (jamais dans le controller et encore moins dans le modèle!).
 
-**Note:** Exemples dans **ExemplesTwigController** dans **Projet1Symfony**)
+**Note:** Exemples dans **ExemplesTwigController** dans **Projet1Symfony**
 
 Le moteur TWIG est un **composant** de Symfony mais on pourrait l'utiliser dans n'importe quel projet ailleurs.
 
@@ -1477,6 +1477,13 @@ Les voitures :
 {% endblock %}
 ```
 
+
+Vous pouvez aussi **créer de variables dans twig**.
+
+```twig
+{{ set nomVar = 5 }}
+{{ set tab = [4,5,6] }}
+```
 
 <br>
 
@@ -8152,6 +8159,12 @@ L'assistant vous demandera :
 
 -   Si on souhaite hasher les passwords (oui!)
 
+**Important**: Si vous obtenez une érreur, vous devez changer la version du maker-bundle à la 1.43 dans composer.json.
+
+``` 
+composer update
+```
+
 Ouvrez **src/Entity/User.php**:
 
 ```php
@@ -10586,3 +10599,6 @@ traitera pas dans ce tuto.
 >
 <https://symfony.com/doc/current/translation.html(voir la section
 **Basic Translation**).
+
+
+--- Rajouter App\Command
