@@ -46,7 +46,9 @@ Si on va utiliser des annotations (et on le fera):
 composer require annotations
 ```
 
-## Entities
+
+## Modèle et Entités
+
 
 - Rajouter les librairies de Doctrine dans chaque nouveau projet
 ```console
@@ -54,7 +56,19 @@ composer require symfony/orm-pack
 composer require --dev symfony/maker-bundle
 ```
 
-- Creation/rajout d'attributs et de rélations dans les entités
+Créer BD: 
+```
+symfony console doctrine:database:create
+symfony console doctr:data:cre (par exemples)
+```
+
+Effacer BD (opt.):
+```
+symfony console doctrine:database:drop --force
+symfony console doctr:data:drop --force (par exemples)
+```
+
+- Creation des entités et rajout d'attributs et de rélations dans les entités
 ```console
 php bin/console make:entity
 ```
@@ -63,6 +77,16 @@ Pour créer une rélation: choisir *relation* dans le type de données de l'attr
 Pour effacer une proprieté: 
 - effacez la propriété partout dans le fichier de l'entité (définition de la classe, set, get et code d'initialisation dans le constructeur)
 - effacez le repository (attention à ne pas perdre de méthodes créés par vous-mêmes)
+
+
+Pour appliquer dans la BD les changements des entités:
+```
+symfony console make:migration
+symfony console doctrine:migrations:migrate
+```
+
+
+
 
 
 ## Utiliser Apache comme serveur de dev
