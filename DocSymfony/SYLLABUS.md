@@ -6053,6 +6053,31 @@ On peut rendre le formulaire complète ou morceaux, en utilisant un thème (Boot
 
 **form_start** et **form_end** générent les **balises** du début et fin du formulaire et **form_widget (nomFormulaire)** génère tous les contrôles d'un coup. 
 
+
+Vous pouvez générer chaque contrôle de façon indépendante. Vous avez deux options: **form_widget** (contrôle sans etiquettes) et **form_row** (avec etiquettes).
+
+Exemples:
+
+
+
+```twig
+    {{ form_start(unFormulaire) }}
+        {{ form_widget(unFormulaire.code) }}
+        {{ form_widget(unFormulaire.nom}) }}
+    {{ form_end(unFormulaire, {render_rest: false}) }}
+```
+
+```twig
+    {{ form_start(unFormulaire) }}
+        {{ form_row(unFormulaire.code) }}
+        {{ form_row(unFormulaire.nom}) }}
+    {{ form_end(unFormulaire, {render_rest: false}) }}
+```
+
+
+
+
+
 Il nous manque le **submit**, on le verra dans les sections suivantes.
 
 Nous n'allons pas rajouter un bouton de submit **dans la classe** du
