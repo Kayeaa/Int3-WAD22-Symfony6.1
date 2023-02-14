@@ -9,7 +9,7 @@ Créez la structure HTML
 2.  Créer projet Symfony
 
 3.  Copier le dossier du template à l\'interieur du projet (ex: dossier
-    /src)
+    /src/monTemplate)
 
 4.  Faire un premier Controller (ex: FrontController)
 
@@ -77,9 +77,9 @@ Les liens .css ni .js ne fonctionneront plus. On doit les transformer
 dans des appel à la fonction **asset** (voir code dans
 **base.html.twig** et comparer ce code avec l\'original)
 
-1.  Créez un dossier **assets** dans **public**
+1.  Créez un dossier **assets** dans **public** (si vous n'utilisez pas webpack!!)
 
 2.  Adaptez tous les liens selon le modèle de **index.html**
 
-Note : Eliminé, de Styles.css
+
 
