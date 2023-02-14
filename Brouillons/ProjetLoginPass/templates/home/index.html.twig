@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<div>
+    <a href="{{ path ('app_logout') }}">Se deconnecter</a>
+    <h1>Vous êtes dans l'accueil</h1>
+    {{ dump (app.user) }}
+    <h4>Bienvenue {{ app.user.nom }}</h4>
+
+    <h1>Voici vos produits favoris:</h1>
+    {% for produit in produitsFavoris %}
+        <p>Nom: {{ produit.nom | capitalize }}</p>
+        <p>Prix: {{ produit.prix }}</p>
+        <br>
+    {% endfor %}
+
+</div>
+
+
+{% endblock %}
