@@ -1860,7 +1860,8 @@ page qui contiendra des blocs variables.
 
 **Exemple** : création d'un squelette de master page et inclusion du contenu dans sa section principale (main)
 
-1. Créez un **template twig contenant le squelette d'une master page** : **master_page_1.html.twig**
+	
+1. Créez un controller ExemplesTwigHeritage et **template twig contenant le squelette d'une master page** : **master_page_1.html.twig**
 
 ```twig
 <html>
