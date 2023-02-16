@@ -193,7 +193,7 @@
   - [jQuery](#jquery)
 - [4. Installation de packages dans un projet Symfony Flex](#4-installation-de-packages-dans-un-projet-symfony-flex)
 - [(En cours, cette doc. appartient à Symfony 4) Traduction des messages de succès/erreur](#en-cours-cette-doc-appartient-à-symfony-4-traduction-des-messages-de-succèserreur)
-  - [Annexe (en cours, brouillon): Pas pour la création d'un projet](#annexe-en-cours-brouillon-pas-pour-la-création-dun-projet)
+  - [Annexe (en cours, brouillon): les pas pour la création d'un projet](#annexe-en-cours-brouillon-les-pas-pour-la-création-dun-projet)
     - [Analyse](#analyse)
     - [Implementation](#implementation)
     - [1. Modèle](#1-modèle)
@@ -10634,7 +10634,7 @@ traitera pas dans ce tuto.
 
 <br>
 
-## Annexe (en cours, brouillon): Pas pour la création d'un projet
+## Annexe (en cours, brouillon): les pas pour la création d'un projet
 
 <br>
 
