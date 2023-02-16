@@ -193,6 +193,11 @@
   - [jQuery](#jquery)
 - [4. Installation de packages dans un projet Symfony Flex](#4-installation-de-packages-dans-un-projet-symfony-flex)
 - [(En cours, cette doc. appartient à Symfony 4) Traduction des messages de succès/erreur](#en-cours-cette-doc-appartient-à-symfony-4-traduction-des-messages-de-succèserreur)
+  - [Annexe (en cours, brouillon): Pas pour la création d'un projet](#annexe-en-cours-brouillon-pas-pour-la-création-dun-projet)
+    - [Analyse](#analyse)
+    - [Implementation](#implementation)
+    - [1. Modèle](#1-modèle)
+    - [2. Controllers et vues](#2-controllers-et-vues)
 
 <br>
 <br>
@@ -10625,6 +10630,47 @@ traitera pas dans ce tuto.
 >
 <https://symfony.com/doc/current/translation.html(voir la section
 **Basic Translation**).
+
+
+<br>
+
+## Annexe (en cours, brouillon): Pas pour la création d'un projet
+
+<br>
+
+
+### Analyse
+
+- Définir les fonctionnalités (interface et/ou UML use case)
+- Créer diagramme de classes
+- Associer controllers et fonctionnalités / interface
+- Créer un repo dans Github
+
+
+### Implementation
+
+### 1. Modèle
+
+- Créer le modèle 
+- Créer script (.bat en windows) pour initialiser-effacer la BD-lancer les migrations
+- Créer un script pour pusher votre code dans le repo remote
+- Lancer la migration (faites le à chaque changement du modèle)
+
+- Creer le système d'authentication (class User) et le controller pour login
+- Créer le controller pour s'enregistrer sur le site
+
+- Créer des fixtures pour remplir de données de base du modèle, speciálement pour l'User car vous ne voulez pas devoir enregistrer à la main un User à chaque migration (voir UserFixtures dans le projet, elle est particulière)
+  
+### 2. Controllers et vues
+
+- Installez webpack-encore
+- Lancer yarn install
+
+- Créer un prémier controller (p.e. HomeController) et une action home (route "/") auquel on redirige après le login 
+- Créer la vue pour l'action précédante
+- Implementer une par une (dans un ordre logique) les fonctionnalités dans les controllers, créer de services pour les fonctionnalités qui se répétent ou qui se trouvent dans plusieurs actions (ex: file upload)
+
+
 
 
 --- Rajouter App\Command
