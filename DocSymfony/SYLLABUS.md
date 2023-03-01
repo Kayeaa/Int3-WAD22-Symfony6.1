@@ -9514,7 +9514,6 @@ on doit changer
 .setPublicPath('/build')  
 ```
 vers: 
-
 ```
 .setPublicPath('build')  // au lieu de .setPublicPath('build') à cause du ALIAS d'APACHE (uniquement serveur Interface3)
 ```
