@@ -9507,6 +9507,17 @@ pouvez personnaliser Encore selon vos besoins :
 .**setPublicPath** : le chemin utilisé par le serveur (ex: dans le code
 des vues) pour accéder l'OutputPath qu'on vient de mentionner
 
+**Attention**:
+
+on doit changer 
+```
+.setPublicPath('/build')  
+```
+vers: 
+```
+.setPublicPath('build')  // au lieu de .setPublicPath('build') à cause du ALIAS d'APACHE (uniquement serveur Interface3)
+```
+
 .**addEntry** **('app','./assets/app.js')** : on aura un
 **entry** pour **chaque fichier .js qui regroupe un ensemble de code**. Ici on a crée un entry portant le nom "app" qui pointe vers un fichier
 app.js. On peut avoir d'autres Entries (d'autres fichiers) dont le code sera rajouté au code final.
