@@ -87,16 +87,17 @@ class Commande
     // la méthode equals compare deux détails (méthode dans DetailCommande)
     public function addDetail(DetailCommande $detailRajouter): self
     {
-        // if (!$this->details->contains($detailRajouter)) {
-        //     $this->details[] = $detailRajouter;
-        //     $detailRajouter->setCommande($this);
-        // }
+        // on doit parcourir tous les détails pour voir si le produit du détail à rajouter se trouve déjà dans la commande.
+        // Si c'est le cas, on doit augmenter la quantité du détail du produit et pas le rajouter à nouveau
+        // ex: on a déjà 5 gsms dans la commande: si on rajoute 3 on doit avoir un seul détail de 8 gsms et pas deux détails de 5 et 3
         foreach ($this->getDetails() as $detailExistant) {
             if ($detailRajouter->equals($detailExistant)) {
+                // le produit est déjà là
                 $detailExistant->setQuantite($detailExistant->getQuantite() + $detailRajouter->getQuantite());
                 return $this;
             }    
         }
+        // le produit n'est pas encore dans la commande
         $this->details[] = $detailRajouter;
         $detailRajouter->setCommande($this);
 

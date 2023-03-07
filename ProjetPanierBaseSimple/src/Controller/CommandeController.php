@@ -21,6 +21,7 @@ class CommandeController extends AbstractController
         ManagerRegistry $doctrine
     ): Response {
 
+        // obtenir le panier de la session
         $commandePanier = $session->get("panierCommande");
 
         $em = $doctrine->getManager();
@@ -34,9 +35,10 @@ class CommandeController extends AbstractController
         // et puis on copie les détails du panier 
         $commandeBD->setDateCreation(new DateTime());
 
+        // parcourir le panier
         foreach ($commandePanier->getDetails() as $detail) {
             
-            // Dans notre cas il y a cascade persist uniquement dans les rélations OneToMany, pas ManyToOne
+            // Dans notre cas il y a cascade persist dans les rélations OneToMany
 
             // Créer un détail vide
             $detailBD = new DetailCommande();

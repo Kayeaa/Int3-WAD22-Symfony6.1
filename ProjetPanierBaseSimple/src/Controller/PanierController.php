@@ -55,8 +55,8 @@ class PanierController extends AbstractController
 
     // version panier avec des entités.
     // type 2: rajouter plusieurs unités d'un produit à la fois
-    // On reçcoit un form
-    // on crée une commande, mais elle est vide au départ
+    // On reçoit un form
+    // on crée une entité Commande dans la session qui sera vide au départ
     // Quand on passera la commande on fera le persist
     #[Route('/panier/add', name: 'panier_add_produit_plusieurs')]
     public function addProduitPlusieurs(
@@ -78,12 +78,9 @@ class PanierController extends AbstractController
 
         $produit->addDetail($detail);
 
-        // old
-        // $detail->setProduit($repProduit->find($id));
+        $detail->setQuantite($quantite); // on fixe ici la quantité, mais quand on fait addDetail l'addition sera faite (regardez le code de addDetail dans l'entity Commande)
 
-        $detail->setQuantite($quantite); // on fixe ici la quantité, mais quand on fait addDetail l'addition sera faite (regardez le code de addDetail)
-
-        // rajouter le detail à la commande        
+        // rajouter le detail à la commande dans la session        
         $panierCommande->addDetail($detail);  // regardez le code de addDetail       
 
         $session->set('panierCommande', $panierCommande);
