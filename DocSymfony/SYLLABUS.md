@@ -8582,7 +8582,7 @@ symfony console make:registration-form
 ```
 Suivez les instructions de l'assistant. Choisissez si :
 
-- Vous voulez qu'on ne puisse pas avoir de doublons dans les Users (no) 
+- Vous voulez qu'on ne puisse pas avoir de doublons dans les Users (yes) 
 - Vous voulez envoyer un lien d'authentification pour l'inscription par mail. Si oui, Symfony vous demandera de taper l'adresse mail et il faudra configurer le protocol de mail. **Tapez 'no'**
 - Vous voulez (par défaut non) rajouter l'user id dans le lien (no)
 - Vous voulez que les utilisateurs soient connectés directement après l'inscription (comme dans la plupart de sites)
